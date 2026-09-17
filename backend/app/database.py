@@ -11,7 +11,7 @@ try:
     from dotenv import load_dotenv
     _env_file = Path(__file__).parent.parent / ".env"
     if _env_file.exists():
-        load_dotenv(_env_file, override=True)
+        load_dotenv(_env_file, override=False)
 except ImportError:
     pass  # python-dotenv not available; rely on OS environment
 
@@ -28,11 +28,11 @@ if not DATABASE_URL:
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+_is_sqlite = DATABASE_URL.startswith("sqlite")
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,       # drops stale connections from the pool automatically
-    pool_size=5,
-    max_overflow=10,
+    **({} if _is_sqlite else {"pool_size": 5, "max_overflow": 10}),
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
