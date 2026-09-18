@@ -4,6 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case
+from starlette.concurrency import run_in_threadpool
 from ..database import get_db
 from ..models import User, FileItem, ShareLink
 from ..schemas import FileResponse, FileCreateResponse
@@ -93,9 +94,11 @@ async def upload_encrypted_file(
 
     # Upload ciphertext to R2 then persist metadata.
     # On any failure after the object is created, delete it to avoid orphans.
+    # Both storage calls run in a threadpool worker so the event loop is not
+    # blocked by boto3's synchronous network I/O.
     object_key = generate_object_key()
     try:
-        upload_file_streaming(object_key, spooled, content_type=mime_type)
+        await run_in_threadpool(upload_file_streaming, object_key, spooled, mime_type)
 
         file_record = FileItem(
             owner_id=current_user.id,
@@ -109,7 +112,7 @@ async def upload_encrypted_file(
         db.commit()
         db.refresh(file_record)
     except Exception:
-        delete_file(object_key)
+        await run_in_threadpool(delete_file, object_key)
         raise
     finally:
         spooled.close()
@@ -188,7 +191,7 @@ def get_file_detail(
     return res
 
 @router.delete("/{file_id}")
-def delete_file_record(
+async def delete_file_record(
     file_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -201,7 +204,7 @@ def delete_file_record(
     if not f:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
 
-    delete_file(f.r2_object_key)
+    await run_in_threadpool(delete_file, f.r2_object_key)
 
     db.delete(f)
     db.commit()

@@ -1,0 +1,498 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\Aamin\Desktop\App\vaultkey\backend
+configfile: pytest.ini
+plugins: anyio-4.12.1
+collected 28 items
+
+backend\test_streaming.py .....FFFFFFFFFFFFFFFFFFFFFFF                   [100%]
+
+================================== FAILURES ===================================
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B23D0130>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 11248 and this is thread id 38872.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B23D2200>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 35932 and this is thread id 30648.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B22F76A0>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 7596 and this is thread id 12536.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B2345D50>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 44836 and this is thread id 34996.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B24304F0>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 30648 and this is thread id 12812.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B23D2B60>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 38872 and this is thread id 34876.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B10E57B0>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 35700 and this is thread id 23308.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_dl_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B2344220>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 12812 and this is thread id 36984.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+----------------------------- Captured log setup ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B21B8040>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 23308 and this is thread id 35700.
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B24305E0>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 35700 and this is thread id 34920.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B23D2E30>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 12536 and this is thread id 44688.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B23D18A0>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 44688 and this is thread id 28856.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B23D2200>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 34996 and this is thread id 35260.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B2433F10>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 35260 and this is thread id 33512.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B2432F20>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 34920 and this is thread id 41384.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B23D3C40>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 34876 and this is thread id 42972.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B2432200>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 28856 and this is thread id 33856.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B2431E40>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 36984 and this is thread id 34188.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B24325C0>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 42972 and this is thread id 43644.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+    [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+    FROM users 
+    WHERE users.email = ?
+     LIMIT ? OFFSET ?]
+    [parameters: ('stream_view_test@vaultkey.app', 1, 0)]
+    (Background on this error at: https://sqlalche.me/e/20/e3q8)
+------------------------------ Captured log call ------------------------------
+ERROR    sqlalchemy.pool.impl.SingletonThreadPool:base.py:377 Exception closing connection <sqlite3.Connection object at 0x00000166B24662F0>
+Traceback (most recent call last):
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\pool\base.py", line 375, in _close_connection
+    self._dialect.do_close(connection)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 721, in do_close
+    dbapi_connection.close()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 41384 and this is thread id 16972.
+C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py:952: sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+============================== warnings summary ===============================
+..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+  C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.9/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\test_streaming.py::TestStreamingDownload::test_body_closed_after_success
+FAILED backend\test_streaming.py::TestStreamingDownload::test_body_closed_on_iterator_error
+FAILED backend\test_streaming.py::TestStreamingDownload::test_chunk_size_is_1_mb
+FAILED backend\test_streaming.py::TestStreamingDownload::test_header_content_disposition_is_attachment
+FAILED backend\test_streaming.py::TestStreamingDownload::test_header_x_iv_hex_present
+FAILED backend\test_streaming.py::TestStreamingDownload::test_header_x_mime_type_present
+FAILED backend\test_streaming.py::TestStreamingDownload::test_header_x_original_filename_present
+FAILED backend\test_streaming.py::TestStreamingDownload::test_response_body_assembles_correctly
+FAILED backend\test_streaming.py::TestStreamingDownload::test_response_status_200
+FAILED backend\test_streaming.py::TestStreamingDownload::test_storage_404_surfaces_before_stream
+FAILED backend\test_streaming.py::TestStreamingDownload::test_storage_502_surfaces_before_stream
+FAILED backend\test_streaming.py::TestStreamingDownload::test_view_only_token_rejected_with_403
+FAILED backend\test_streaming.py::TestStreamingView::test_body_closed_after_success
+FAILED backend\test_streaming.py::TestStreamingView::test_body_closed_on_iterator_error
+FAILED backend\test_streaming.py::TestStreamingView::test_chunk_size_is_1_mb
+FAILED backend\test_streaming.py::TestStreamingView::test_download_token_rejected_with_400
+FAILED backend\test_streaming.py::TestStreamingView::test_header_x_iv_hex_present
+FAILED backend\test_streaming.py::TestStreamingView::test_header_x_mime_type_present
+FAILED backend\test_streaming.py::TestStreamingView::test_header_x_original_filename_present
+FAILED backend\test_streaming.py::TestStreamingView::test_no_content_disposition_header
+FAILED backend\test_streaming.py::TestStreamingView::test_response_body_assembles_correctly
+FAILED backend\test_streaming.py::TestStreamingView::test_response_status_200
+FAILED backend\test_streaming.py::TestStreamingView::test_storage_404_surfaces_before_stream
+================== 23 failed, 5 passed, 5 warnings in 1.66s ===================

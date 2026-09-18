@@ -1,0 +1,638 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\Aamin\Desktop\App\vaultkey\backend
+configfile: pytest.ini
+plugins: anyio-4.12.1
+collected 28 items
+
+test_streaming.py .....FFFFFFFFFFF....F.......                           [100%]
+
+================================== FAILURES ===================================
+____________ TestStreamingDownload.test_body_closed_after_success _____________
+test_streaming.py:221: in test_body_closed_after_success
+    self.assertEqual(resp.status_code, 200)
+E   AssertionError: 403 != 200
+__________ TestStreamingDownload.test_body_closed_on_iterator_error ___________
+test_streaming.py:286: in test_body_closed_on_iterator_error
+    body.close.assert_called_once()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:958: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'close' to have been called once. Called 0 times.
+________________ TestStreamingDownload.test_chunk_size_is_1_mb ________________
+test_streaming.py:217: in test_chunk_size_is_1_mb
+    body.iter_chunks.assert_called_once_with(1 * 1024 * 1024)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:990: in assert_called_once_with
+    raise AssertionError(msg)
+E   AssertionError: Expected 'iter_chunks' to be called once. Called 0 times.
+_____ TestStreamingDownload.test_header_content_disposition_is_attachment _____
+test_streaming.py:238: in test_header_content_disposition_is_attachment
+    self.assertIn("content-disposition", resp.headers)
+E   AssertionError: 'content-disposition' not found in Headers({'content-length': '67', 'content-type': 'application/json'})
+_____________ TestStreamingDownload.test_header_x_iv_hex_present ______________
+test_streaming.py:226: in test_header_x_iv_hex_present
+    self.assertIn("x-iv-hex", resp.headers)
+E   AssertionError: 'x-iv-hex' not found in Headers({'content-length': '67', 'content-type': 'application/json'})
+____________ TestStreamingDownload.test_header_x_mime_type_present ____________
+test_streaming.py:234: in test_header_x_mime_type_present
+    self.assertIn("x-mime-type", resp.headers)
+E   AssertionError: 'x-mime-type' not found in Headers({'content-length': '67', 'content-type': 'application/json'})
+________ TestStreamingDownload.test_header_x_original_filename_present ________
+test_streaming.py:230: in test_header_x_original_filename_present
+    self.assertIn("x-original-filename", resp.headers)
+E   AssertionError: 'x-original-filename' not found in Headers({'content-length': '67', 'content-type': 'application/json'})
+________ TestStreamingDownload.test_response_body_assembles_correctly _________
+test_streaming.py:207: in test_response_body_assembles_correctly
+    self.assertEqual(resp.content, data)
+E   AssertionError: b'{"detail":"This share is view-only. Downloading is not permitted."}' != b'full ciphertext bytes for download'
+_______________ TestStreamingDownload.test_response_status_200 ________________
+test_streaming.py:197: in test_response_status_200
+    self.assertEqual(resp.status_code, 200)
+E   AssertionError: 403 != 200
+________ TestStreamingDownload.test_storage_404_surfaces_before_stream ________
+test_streaming.py:256: in test_storage_404_surfaces_before_stream
+    self.assertEqual(resp.status_code, 404)
+E   AssertionError: 403 != 404
+________ TestStreamingDownload.test_storage_502_surfaces_before_stream ________
+test_streaming.py:265: in test_storage_502_surfaces_before_stream
+    self.assertEqual(resp.status_code, 502)
+E   AssertionError: 403 != 502
+___________ TestStreamingView.test_download_token_rejected_with_400 ___________
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 77, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 186, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 783, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\unittest\case.py", line 58, in testPartExecutor
+    |     yield
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\unittest\case.py", line 651, in run
+    |     self._callTestMethod(testMethod)
+    |     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\unittest\case.py", line 606, in _callTestMethod
+    |     if method() is not None:
+    |        ~~~~~~^^
+    |   File "C:\Users\Aamin\Desktop\App\vaultkey\backend\test_streaming.py", line 369, in test_download_token_rejected_with_400
+    |     resp = self.client.post(
+    |         f"/api/access/{dl_token}/view",
+    |         json={"password": None},
+    |     )
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 597, in post
+    |     return super().post(
+    |            ~~~~~~~~~~~~^
+    |         url,
+    |         ^^^^
+    |     ...<10 lines>...
+    |         extensions=extensions,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 1145, in post
+    |     return self.request(
+    |            ~~~~~~~~~~~~^
+    |         "POST",
+    |         ^^^^^^^
+    |     ...<11 lines>...
+    |         extensions=extensions,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 488, in request
+    |     return super().request(
+    |            ~~~~~~~~~~~~~~~^
+    |         method,
+    |         ^^^^^^^
+    |     ...<11 lines>...
+    |         extensions=extensions,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 827, in request
+    |     return self.send(request, auth=auth, follow_redirects=follow_redirects)
+    |            ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 914, in send
+    |     response = self._send_handling_auth(
+    |         request,
+    |     ...<2 lines>...
+    |         history=[],
+    |     )
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    |     response = self._send_handling_redirects(
+    |         request,
+    |         follow_redirects=follow_redirects,
+    |         history=history,
+    |     )
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    |     response = self._send_single_request(request)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    |     response = transport.handle_request(request)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 381, in handle_request
+    |     raise exc
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 378, in handle_request
+    |     portal.call(self.app, scope, receive, send)
+    |     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\from_thread.py", line 334, in call
+    |     return cast(T_Retval, self.start_task_soon(func, *args).result())
+    |                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\concurrent\futures\_base.py", line 456, in result
+    |     return self.__get_result()
+    |            ~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    |     raise self._exception
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\from_thread.py", line 259, in _call_func
+    |     retval = await retval_or_awaitable
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\applications.py", line 113, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    |     raise exc
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\slowapi\middleware.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 214, in run_endpoint_function
+    |     return await run_in_threadpool(dependant.call, **values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\concurrency.py", line 39, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func, *args)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\to_thread.py", line 63, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |         func, args, abandon_on_cancel=abandon_on_cancel, limiter=limiter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 2502, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 986, in run
+    |     result = context.run(func, *args)
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\slowapi\extension.py", line 770, in sync_wrapper
+    |     response = func(*args, **kwargs)
+    |   File "C:\Users\Aamin\Desktop\App\vaultkey\backend\app\routes\access.py", line 386, in view_encrypted_file
+    |     body = _open_body(file_item.r2_object_key)
+    |   File "C:\Users\Aamin\Desktop\App\vaultkey\backend\app\storage.py", line 169, in _open_body
+    |     response = _get_client().get_object(Bucket=R2_BUCKET_NAME, Key=key)
+    |                ~~~~~~~~~~~^^
+    |   File "C:\Users\Aamin\Desktop\App\vaultkey\backend\app\storage.py", line 77, in _get_client
+    |     _s3_client = boto3.client(
+    |         "s3",
+    |     ...<4 lines>...
+    |         config=_CLIENT_CONFIG,
+    |     )
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\boto3\__init__.py", line 92, in client
+    |     return _get_default_session().client(*args, **kwargs)
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\boto3\session.py", line 297, in client
+    |     return self._session.create_client(
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    |         service_name,
+    |         ^^^^^^^^^^^^^
+    |     ...<8 lines>...
+    |         config=config,
+    |         ^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\session.py", line 997, in create_client
+    |     client = client_creator.create_client(
+    |         service_name=service_name,
+    |     ...<8 lines>...
+    |         auth_token=auth_token,
+    |     )
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\client.py", line 165, in create_client
+    |     client_args = self._get_client_args(
+    |         service_model,
+    |     ...<10 lines>...
+    |         partition_data,
+    |     )
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\client.py", line 524, in _get_client_args
+    |     return args_creator.get_client_args(
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    |         service_model,
+    |         ^^^^^^^^^^^^^^
+    |     ...<10 lines>...
+    |         partition_data,
+    |         ^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\args.py", line 138, in get_client_args
+    |     endpoint = endpoint_creator.create_endpoint(
+    |         service_model,
+    |     ...<9 lines>...
+    |         proxies_config=new_config.proxies_config,
+    |     )
+    |   File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\endpoint.py", line 408, in create_endpoint
+    |     raise ValueError(f"Invalid endpoint: {endpoint_url}")
+    | ValueError: Invalid endpoint: https://test_account.r2.cloudflarestorage.com
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Aamin\Desktop\App\vaultkey\backend\test_streaming.py", line 369, in test_download_token_rejected_with_400
+    resp = self.client.post(
+        f"/api/access/{dl_token}/view",
+        json={"password": None},
+    )
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 597, in post
+    return super().post(
+           ~~~~~~~~~~~~^
+        url,
+        ^^^^
+    ...<10 lines>...
+        extensions=extensions,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 1145, in post
+    return self.request(
+           ~~~~~~~~~~~~^
+        "POST",
+        ^^^^^^^
+    ...<11 lines>...
+        extensions=extensions,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 488, in request
+    return super().request(
+           ~~~~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<11 lines>...
+        extensions=extensions,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 827, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 381, in handle_request
+    raise exc
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py", line 378, in handle_request
+    portal.call(self.app, scope, receive, send)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\from_thread.py", line 334, in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\from_thread.py", line 259, in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    raise exc
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\slowapi\middleware.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\concurrency.py", line 39, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        func, args, abandon_on_cancel=abandon_on_cancel, limiter=limiter
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 2502, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\slowapi\extension.py", line 770, in sync_wrapper
+    response = func(*args, **kwargs)
+  File "C:\Users\Aamin\Desktop\App\vaultkey\backend\app\routes\access.py", line 386, in view_encrypted_file
+    body = _open_body(file_item.r2_object_key)
+  File "C:\Users\Aamin\Desktop\App\vaultkey\backend\app\storage.py", line 169, in _open_body
+    response = _get_client().get_object(Bucket=R2_BUCKET_NAME, Key=key)
+               ~~~~~~~~~~~^^
+  File "C:\Users\Aamin\Desktop\App\vaultkey\backend\app\storage.py", line 77, in _get_client
+    _s3_client = boto3.client(
+        "s3",
+    ...<4 lines>...
+        config=_CLIENT_CONFIG,
+    )
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\boto3\__init__.py", line 92, in client
+    return _get_default_session().client(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\boto3\session.py", line 297, in client
+    return self._session.create_client(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        service_name,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        config=config,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\session.py", line 997, in create_client
+    client = client_creator.create_client(
+        service_name=service_name,
+    ...<8 lines>...
+        auth_token=auth_token,
+    )
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\client.py", line 165, in create_client
+    client_args = self._get_client_args(
+        service_model,
+    ...<10 lines>...
+        partition_data,
+    )
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\client.py", line 524, in _get_client_args
+    return args_creator.get_client_args(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        service_model,
+        ^^^^^^^^^^^^^^
+    ...<10 lines>...
+        partition_data,
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\args.py", line 138, in get_client_args
+    endpoint = endpoint_creator.create_endpoint(
+        service_model,
+    ...<9 lines>...
+        proxies_config=new_config.proxies_config,
+    )
+  File "C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\endpoint.py", line 408, in create_endpoint
+    raise ValueError(f"Invalid endpoint: {endpoint_url}")
+ValueError: Invalid endpoint: https://test_account.r2.cloudflarestorage.com
+
+During handling of the above exception, another exception occurred:
+test_streaming.py:369: in test_download_token_rejected_with_400
+    resp = self.client.post(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py:597: in post
+    return super().post(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py:1145: in post
+    return self.request(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py:488: in request
+    return super().request(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py:381: in handle_request
+    raise exc
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py:378: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py:187: in __call__
+    raise exc
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py:85: in __call__
+    await self.app(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py:185: in __call__
+    with collapse_excgroups():
+         ^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:162: in __exit__
+    self.gen.throw(value)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py:83: in collapse_excgroups
+    raise exc
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py:187: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\slowapi\middleware.py:128: in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py:163: in call_next
+    raise app_exc
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py:149: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py:62: in wrapped_app
+    raise exc
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py:51: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py:715: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py:735: in app
+    await route.handle(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py:288: in handle
+    await self.app(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py:62: in wrapped_app
+    raise exc
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py:51: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py:73: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py:301: in app
+    raw_response = await run_endpoint_function(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py:214: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\concurrency.py:39: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\to_thread.py:63: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py:2502: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py:986: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\slowapi\extension.py:770: in sync_wrapper
+    response = func(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^
+app\routes\access.py:386: in view_encrypted_file
+    body = _open_body(file_item.r2_object_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\storage.py:169: in _open_body
+    response = _get_client().get_object(Bucket=R2_BUCKET_NAME, Key=key)
+               ^^^^^^^^^^^^^
+app\storage.py:77: in _get_client
+    _s3_client = boto3.client(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\boto3\__init__.py:92: in client
+    return _get_default_session().client(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\boto3\session.py:297: in client
+    return self._session.create_client(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\session.py:997: in create_client
+    client = client_creator.create_client(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\client.py:165: in create_client
+    client_args = self._get_client_args(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\client.py:524: in _get_client_args
+    return args_creator.get_client_args(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\args.py:138: in get_client_args
+    endpoint = endpoint_creator.create_endpoint(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\botocore\endpoint.py:408: in create_endpoint
+    raise ValueError(f"Invalid endpoint: {endpoint_url}")
+E   ValueError: Invalid endpoint: https://test_account.r2.cloudflarestorage.com
+============================== warnings summary ===============================
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+  C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.9/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED test_streaming.py::TestStreamingDownload::test_body_closed_after_success
+FAILED test_streaming.py::TestStreamingDownload::test_body_closed_on_iterator_error
+FAILED test_streaming.py::TestStreamingDownload::test_chunk_size_is_1_mb - As...
+FAILED test_streaming.py::TestStreamingDownload::test_header_content_disposition_is_attachment
+FAILED test_streaming.py::TestStreamingDownload::test_header_x_iv_hex_present
+FAILED test_streaming.py::TestStreamingDownload::test_header_x_mime_type_present
+FAILED test_streaming.py::TestStreamingDownload::test_header_x_original_filename_present
+FAILED test_streaming.py::TestStreamingDownload::test_response_body_assembles_correctly
+FAILED test_streaming.py::TestStreamingDownload::test_response_status_200 - A...
+FAILED test_streaming.py::TestStreamingDownload::test_storage_404_surfaces_before_stream
+FAILED test_streaming.py::TestStreamingDownload::test_storage_502_surfaces_before_stream
+FAILED test_streaming.py::TestStreamingView::test_download_token_rejected_with_400
+================== 12 failed, 16 passed, 5 warnings in 3.17s ==================

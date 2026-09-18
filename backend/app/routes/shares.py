@@ -83,21 +83,27 @@ def create_share_link(
 @router.get("", response_model=List[ShareDetailResponse])
 def list_user_shares(
     file_id: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 50,  # ponytail: max 100; add cursor-based pagination if user share counts grow into the thousands
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    query = db.query(ShareLink).filter(ShareLink.owner_id == current_user.id)
+    page_size = min(max(page_size, 1), 100)
+    offset = (max(page, 1) - 1) * page_size
+
+    query = (
+        db.query(ShareLink, FileItem.original_filename)
+        .outerjoin(FileItem, ShareLink.file_id == FileItem.id)
+        .filter(ShareLink.owner_id == current_user.id)
+    )
     if file_id:
         query = query.filter(ShareLink.file_id == file_id)
 
-    shares = query.order_by(ShareLink.created_at.desc()).all()
+    rows = query.order_by(ShareLink.created_at.desc()).offset(offset).limit(page_size).all()
 
     now = datetime.now(timezone.utc)
     result = []
-    for s in shares:
-        f = db.query(FileItem).filter(FileItem.id == s.file_id).first()
-        filename = f.original_filename if f else "Unknown"
-
+    for s, filename in rows:
         status_str = "ACTIVE"
         if s.revoked:
             status_str = "REVOKED"
@@ -108,11 +114,10 @@ def list_user_shares(
         elif s.max_downloads > 0 and s.download_count >= s.max_downloads:
             status_str = "LIMIT_REACHED"
 
-
-        item = ShareDetailResponse(
+        result.append(ShareDetailResponse(
             id=s.id,
             file_id=s.file_id,
-            original_filename=filename,
+            original_filename=filename or "Unknown",
             expires_at=s.expires_at,
             max_downloads=s.max_downloads,
             download_count=s.download_count,
@@ -122,8 +127,7 @@ def list_user_shares(
             revoked_at=s.revoked_at,
             created_at=s.created_at,
             status=status_str
-        )
-        result.append(item)
+        ))
 
     return result
 
@@ -141,8 +145,7 @@ def get_share_detail(
     if not s:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share link not found")
 
-    f = db.query(FileItem).filter(FileItem.id == s.file_id).first()
-    filename = f.original_filename if f else "Unknown"
+    filename = s.file.original_filename if s.file else "Unknown"
 
     now = datetime.now(timezone.utc)
     status_str = "ACTIVE"

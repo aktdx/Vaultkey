@@ -1,0 +1,20 @@
+At line:1 char:332
++ ... _key() -; $newLines[10] = ''; $newLines.Insert(10, 'ponytail: anyio'' ...
++                                                         ~~~~~~~~~
+Unexpected token 'ponytail:' in expression or statement.
+At line:1 char:392
++ ... 'ponytail: anyio''s default CapacityLimiter is 40 threads; if R2 thro ...
++                                                                  ~
+Missing '(' after 'if' in if statement.
+At line:1 char:840
++ ... stem.Text.Encoding]::UTF8); 'step1 done, lines: ' + $newLines.Count }
++                                                     ~~~~~~~~~~~~~~~~~~~~~
+The string is missing the terminator: '.
+At line:1 char:3
++ & { $p = 'c:\Users\Aamin\Desktop\App\vaultkey\backend\app\storage.py' ...
++   ~
+Missing closing '}' in statement block or type definition.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordEx 
+   ception
+    + FullyQualifiedErrorId : UnexpectedToken
+ 

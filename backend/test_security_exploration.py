@@ -315,7 +315,7 @@ class TestIssue3RateLimiting(unittest.TestCase):
             "SlowAPIMiddleware must be added in main.py",
         )
 
-        def test_limiter_imported_from_shared_module(self):
+    def test_limiter_imported_from_shared_module(self):
         """limiter must be imported from app.limiter (not defined inline)."""
         main_source = _read_source("backend/app/main.py")
         self.assertIn(

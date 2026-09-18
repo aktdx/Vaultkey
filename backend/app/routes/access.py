@@ -1,7 +1,8 @@
+import os
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import Response
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import ShareLink, FileItem, AccessLog, AccessMode
@@ -11,11 +12,33 @@ from ..schemas import (
     BlockedActionReportRequest,
 )
 from ..security import hash_share_token, verify_password
-from ..storage import download_file
+from ..storage import _open_body
 from ..limiter import limiter
 from ..utils import log_event, make_aware
 
 router = APIRouter(prefix="/api/access", tags=["Recipient Access"])
+
+# 1 MB — matches CHUNK_SIZE in routes/files.py for consistent transfer behaviour.
+_CHUNK_SIZE = 1 * 1024 * 1024
+
+# MIME type fallback map — resolved once at module load, not per request.
+_EXT_MIME_FALLBACK: dict = {
+    ".pdf":  "application/pdf",
+    ".png":  "image/png",
+    ".jpg":  "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif":  "image/gif",
+    ".webp": "image/webp",
+    ".txt":  "text/plain",
+    ".md":   "text/markdown",
+    ".json": "application/json",
+    ".js":   "text/javascript",
+    ".py":   "text/x-python",
+    ".html": "text/html",
+    ".css":  "text/css",
+    ".csv":  "text/csv",
+    ".log":  "text/plain",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -34,6 +57,28 @@ def _share_access_mode(share: ShareLink) -> str:
 
 def _is_view_only(share: ShareLink) -> bool:
     return _share_access_mode(share) == AccessMode.VIEW_ONLY.value
+
+
+def _resolve_mime(file_item: FileItem) -> str:
+    """Return the MIME type for a file, falling back to extension lookup."""
+    if file_item.mime_type:
+        return file_item.mime_type
+    ext = os.path.splitext(file_item.original_filename)[1].lower()
+    return _EXT_MIME_FALLBACK.get(ext, "application/octet-stream")
+
+
+def _stream_body(body):
+    """Sync generator that yields 1 MB chunks and closes the R2 body when done.
+
+    Starlette's StreamingResponse wraps sync generators with iterate_in_threadpool
+    automatically, so blocking socket reads from boto3's StreamingBody stay off
+    the ASGI event loop.
+    """
+    try:
+        for chunk in body.iter_chunks(_CHUNK_SIZE):
+            yield chunk
+    finally:
+        body.close()
 
 
 # ---------------------------------------------------------------------------
@@ -171,6 +216,10 @@ def download_encrypted_file(
 
     VIEW_ONLY shares are rejected here with HTTP 403.  The actual restriction
     is enforced server-side — hiding the button in the frontend is NOT sufficient.
+
+    The R2 object is streamed in 1 MB chunks via a sync generator wrapped by
+    Starlette's iterate_in_threadpool, so the API worker never holds the full
+    ciphertext in memory regardless of file size.
     """
     share = get_share_by_token(token, db)
 
@@ -237,7 +286,7 @@ def download_encrypted_file(
         # max_downloads == 0 with access_mode == 'download' means unlimited downloads.
         log_event(db, share, "FILE_DOWNLOADED", "SUCCESS", request)
 
-    # Fetch file metadata
+    # Fetch file metadata — all auth checks must pass before opening the R2 stream.
     file_item = db.query(FileItem).filter(FileItem.id == share.file_id).first()
     if not file_item:
         raise HTTPException(
@@ -245,43 +294,20 @@ def download_encrypted_file(
             detail="Encrypted file payload missing.",
         )
 
-    # Stream ciphertext from R2
-    encrypted_bytes = download_file(file_item.r2_object_key)
-
-    # Resolve MIME type: use stored value, fall back by extension, then generic binary
-    mime_type = file_item.mime_type
-    if not mime_type:
-        import os
-        _EXT_FALLBACK = {
-            ".pdf":  "application/pdf",
-            ".png":  "image/png",
-            ".jpg":  "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".gif":  "image/gif",
-            ".webp": "image/webp",
-            ".txt":  "text/plain",
-            ".md":   "text/markdown",
-            ".json": "application/json",
-            ".js":   "text/javascript",
-            ".py":   "text/x-python",
-            ".html": "text/html",
-            ".css":  "text/css",
-            ".csv":  "text/csv",
-            ".log":  "text/plain",
-        }
-        ext = os.path.splitext(file_item.original_filename)[1].lower()
-        mime_type = _EXT_FALLBACK.get(ext, "application/octet-stream")
+    # Open the R2 object. _open_body raises HTTPException(404/502) on failure,
+    # so errors surface as proper HTTP responses before any bytes are sent.
+    body = _open_body(file_item.r2_object_key)
 
     response_headers = {
         "X-IV-Hex": file_item.iv_hex,
         "X-Original-Filename": file_item.original_filename,
-        "X-Mime-Type": mime_type,
+        "X-Mime-Type": _resolve_mime(file_item),
         "Content-Disposition": f'attachment; filename="{file_item.id}.enc"',
         "Access-Control-Expose-Headers": "X-IV-Hex, X-Original-Filename, X-Mime-Type",
     }
 
-    return Response(
-        content=encrypted_bytes,
+    return StreamingResponse(
+        _stream_body(body),
         media_type="application/octet-stream",
         headers=response_headers,
     )
@@ -302,7 +328,12 @@ def view_encrypted_file(
     It performs the same auth and expiry checks as /download but:
       - requires access_mode == 'view_only'
       - never increments download_count
-      - logs FILE_VIEWED instead of FILE_DOWNLOADED
+      - logs VIEW_STARTED instead of FILE_DOWNLOADED
+      - omits Content-Disposition: attachment (browser should not prompt to save)
+
+    The R2 object is streamed in 1 MB chunks via a sync generator wrapped by
+    Starlette's iterate_in_threadpool, so the API worker never holds the full
+    ciphertext in memory regardless of file size.
     """
     share = get_share_by_token(token, db)
 
@@ -342,7 +373,7 @@ def view_encrypted_file(
     # Log that viewing has started (no counter increment)
     log_event(db, share, "VIEW_STARTED", "SUCCESS", request)
 
-    # Fetch file metadata
+    # Fetch file metadata — all auth checks must pass before opening the R2 stream.
     file_item = db.query(FileItem).filter(FileItem.id == share.file_id).first()
     if not file_item:
         raise HTTPException(
@@ -350,43 +381,20 @@ def view_encrypted_file(
             detail="Encrypted file payload missing.",
         )
 
-    # Stream ciphertext from R2
-    encrypted_bytes = download_file(file_item.r2_object_key)
-
-    # Resolve MIME type
-    mime_type = file_item.mime_type
-    if not mime_type:
-        import os
-        _EXT_FALLBACK = {
-            ".pdf":  "application/pdf",
-            ".png":  "image/png",
-            ".jpg":  "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".gif":  "image/gif",
-            ".webp": "image/webp",
-            ".txt":  "text/plain",
-            ".md":   "text/markdown",
-            ".json": "application/json",
-            ".js":   "text/javascript",
-            ".py":   "text/x-python",
-            ".html": "text/html",
-            ".css":  "text/css",
-            ".csv":  "text/csv",
-            ".log":  "text/plain",
-        }
-        ext = os.path.splitext(file_item.original_filename)[1].lower()
-        mime_type = _EXT_FALLBACK.get(ext, "application/octet-stream")
+    # Open the R2 object. _open_body raises HTTPException(404/502) on failure,
+    # so errors surface as proper HTTP responses before any bytes are sent.
+    body = _open_body(file_item.r2_object_key)
 
     response_headers = {
         "X-IV-Hex": file_item.iv_hex,
         "X-Original-Filename": file_item.original_filename,
-        "X-Mime-Type": mime_type,
+        "X-Mime-Type": _resolve_mime(file_item),
         # No Content-Disposition: attachment — we don't want browsers to suggest saving.
         "Access-Control-Expose-Headers": "X-IV-Hex, X-Original-Filename, X-Mime-Type",
     }
 
-    return Response(
-        content=encrypted_bytes,
+    return StreamingResponse(
+        _stream_body(body),
         media_type="application/octet-stream",
         headers=response_headers,
     )

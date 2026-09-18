@@ -1,0 +1,166 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\Aamin\Desktop\App\vaultkey\backend
+configfile: pytest.ini
+plugins: anyio-4.12.1
+collected 28 items
+
+test_streaming.py .....EEEEEEEEEEEE...F.......                           [100%]
+
+=================================== ERRORS ====================================
+___ ERROR at setup of TestStreamingDownload.test_body_closed_after_success ____
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_ ERROR at setup of TestStreamingDownload.test_body_closed_on_iterator_error __
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_______ ERROR at setup of TestStreamingDownload.test_chunk_size_is_1_mb _______
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_ ERROR at setup of TestStreamingDownload.test_header_content_disposition_is_attachment _
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+____ ERROR at setup of TestStreamingDownload.test_header_x_iv_hex_present _____
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+___ ERROR at setup of TestStreamingDownload.test_header_x_mime_type_present ___
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_ ERROR at setup of TestStreamingDownload.test_header_x_original_filename_present _
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_ ERROR at setup of TestStreamingDownload.test_response_body_assembles_correctly _
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+______ ERROR at setup of TestStreamingDownload.test_response_status_200 _______
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_ ERROR at setup of TestStreamingDownload.test_storage_404_surfaces_before_stream _
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_ ERROR at setup of TestStreamingDownload.test_storage_502_surfaces_before_stream _
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+_ ERROR at setup of TestStreamingDownload.test_view_only_token_rejected_with_403 _
+test_streaming.py:179: in setUpClass
+    cls.share_token = _create_share(cls.client, cls.auth_token, cls.file_id, "download")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+================================== FAILURES ===================================
+___________ TestStreamingView.test_download_token_rejected_with_400 ___________
+test_streaming.py:371: in test_download_token_rejected_with_400
+    dl_token = _create_share(self.client, self.token, self.file_id, "download")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_streaming.py:86: in _create_share
+    resp.raise_for_status()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py:761: in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+E   httpx.HTTPStatusError: Client error '422 Unprocessable Entity' for url 'http://testserver/api/shares'
+E   For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
+============================== warnings summary ===============================
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+  C:\Users\Aamin\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.9/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED test_streaming.py::TestStreamingView::test_download_token_rejected_with_400
+ERROR test_streaming.py::TestStreamingDownload::test_body_closed_after_success
+ERROR test_streaming.py::TestStreamingDownload::test_body_closed_on_iterator_error
+ERROR test_streaming.py::TestStreamingDownload::test_chunk_size_is_1_mb - htt...
+ERROR test_streaming.py::TestStreamingDownload::test_header_content_disposition_is_attachment
+ERROR test_streaming.py::TestStreamingDownload::test_header_x_iv_hex_present
+ERROR test_streaming.py::TestStreamingDownload::test_header_x_mime_type_present
+ERROR test_streaming.py::TestStreamingDownload::test_header_x_original_filename_present
+ERROR test_streaming.py::TestStreamingDownload::test_response_body_assembles_correctly
+ERROR test_streaming.py::TestStreamingDownload::test_response_status_200 - ht...
+ERROR test_streaming.py::TestStreamingDownload::test_storage_404_surfaces_before_stream
+ERROR test_streaming.py::TestStreamingDownload::test_storage_502_surfaces_before_stream
+ERROR test_streaming.py::TestStreamingDownload::test_view_only_token_rejected_with_403
+============= 1 failed, 15 passed, 5 warnings, 12 errors in 2.07s =============
