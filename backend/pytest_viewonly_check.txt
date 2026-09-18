@@ -1,0 +1,55 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Scripts\python.exe
+rootdir: C:\Users\Aamin\Desktop\App\vaultkey\backend
+configfile: pytest.ini
+plugins: anyio-4.14.2
+collecting ... collected 18 items
+
+test_view_only.py::TestViewOnlyShareMode::test_01_download_share_download_endpoint_succeeds PASSED [  5%]
+test_view_only.py::TestViewOnlyShareMode::test_02_view_only_download_endpoint_rejected PASSED [ 11%]
+test_view_only.py::TestViewOnlyShareMode::test_03_view_only_view_endpoint_succeeds PASSED [ 16%]
+test_view_only.py::TestViewOnlyShareMode::test_04_check_endpoint_returns_access_mode PASSED [ 22%]
+test_view_only.py::TestViewOnlyShareMode::test_05_expired_view_only_rejected PASSED [ 27%]
+test_view_only.py::TestViewOnlyShareMode::test_06_revoked_view_only_rejected PASSED [ 33%]
+test_view_only.py::TestViewOnlyShareMode::test_07_password_protected_view_only_requires_password PASSED [ 38%]
+test_view_only.py::TestViewOnlyShareMode::test_08_password_protected_view_only_wrong_password PASSED [ 44%]
+test_view_only.py::TestViewOnlyShareMode::test_09_download_share_unchanged_behaviour PASSED [ 50%]
+test_view_only.py::TestViewOnlyShareMode::test_10_legacy_max_downloads_zero_treated_as_view_only PASSED [ 55%]
+test_view_only.py::TestViewOnlyShareMode::test_11_audit_log_view_started_on_view PASSED [ 61%]
+test_view_only.py::TestViewOnlyShareMode::test_12_audit_log_download_blocked_on_rejected_download PASSED [ 66%]
+test_view_only.py::TestViewOnlyShareMode::test_13_report_blocked_valid_events_accepted PASSED [ 72%]
+test_view_only.py::TestViewOnlyShareMode::test_14_report_blocked_invalid_event_rejected PASSED [ 77%]
+test_view_only.py::TestViewOnlyShareMode::test_15_report_blocked_silently_ignored_for_download_shares PASSED [ 83%]
+test_view_only.py::TestViewOnlyShareMode::test_16_view_endpoint_on_download_share_rejected PASSED [ 88%]
+test_view_only.py::TestViewOnlyShareMode::test_17_view_only_does_not_increment_download_count PASSED [ 94%]
+test_view_only.py::TestViewOnlyShareMode::test_18_create_share_response_includes_access_mode PASSED [100%]
+
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app\schemas.py:14
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:14: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class UserResponse(BaseModel):
+
+app\schemas.py:28
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:28: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileCreateResponse(BaseModel):
+
+app\schemas.py:39
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileResponse(BaseModel):
+
+app\schemas.py:82
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:82: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ShareDetailResponse(BaseModel):
+
+app\schemas.py:129
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:129: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ActivityLogResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 18 passed, 6 warnings in 73.29s (0:01:13) ==================
+
+=== Exit code: 0 ===

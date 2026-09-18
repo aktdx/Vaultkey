@@ -1,0 +1,64 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Aamin\Desktop\App\vaultkey\backend
+configfile: pytest.ini
+plugins: anyio-4.14.2
+collecting ... collected 28 items
+
+test_streaming.py::TestOpenBodyAndStream::test_open_body_raises_404_for_missing_key PASSED [  3%]
+test_streaming.py::TestOpenBodyAndStream::test_open_body_raises_502_for_storage_error PASSED [  7%]
+test_streaming.py::TestOpenBodyAndStream::test_open_body_returns_streaming_body PASSED [ 10%]
+test_streaming.py::TestOpenBodyAndStream::test_open_file_stream_closes_body_on_exception PASSED [ 14%]
+test_streaming.py::TestOpenBodyAndStream::test_open_file_stream_closes_body_on_normal_exit PASSED [ 17%]
+test_streaming.py::TestStreamingDownload::test_body_closed_after_success PASSED [ 21%]
+test_streaming.py::TestStreamingDownload::test_body_closed_on_iterator_error PASSED [ 25%]
+test_streaming.py::TestStreamingDownload::test_chunk_size_is_1_mb PASSED [ 28%]
+test_streaming.py::TestStreamingDownload::test_header_content_disposition_is_attachment PASSED [ 32%]
+test_streaming.py::TestStreamingDownload::test_header_x_iv_hex_present PASSED [ 35%]
+test_streaming.py::TestStreamingDownload::test_header_x_mime_type_present PASSED [ 39%]
+test_streaming.py::TestStreamingDownload::test_header_x_original_filename_present PASSED [ 42%]
+test_streaming.py::TestStreamingDownload::test_response_body_assembles_correctly PASSED [ 46%]
+test_streaming.py::TestStreamingDownload::test_response_status_200 PASSED [ 50%]
+test_streaming.py::TestStreamingDownload::test_storage_404_surfaces_before_stream PASSED [ 53%]
+test_streaming.py::TestStreamingDownload::test_storage_502_surfaces_before_stream PASSED [ 57%]
+test_streaming.py::TestStreamingDownload::test_view_only_token_rejected_with_403 PASSED [ 60%]
+test_streaming.py::TestStreamingView::test_body_closed_after_success PASSED [ 64%]
+test_streaming.py::TestStreamingView::test_body_closed_on_iterator_error PASSED [ 67%]
+test_streaming.py::TestStreamingView::test_chunk_size_is_1_mb PASSED     [ 71%]
+test_streaming.py::TestStreamingView::test_download_token_rejected_with_400 PASSED [ 75%]
+test_streaming.py::TestStreamingView::test_header_x_iv_hex_present PASSED [ 78%]
+test_streaming.py::TestStreamingView::test_header_x_mime_type_present PASSED [ 82%]
+test_streaming.py::TestStreamingView::test_header_x_original_filename_present PASSED [ 85%]
+test_streaming.py::TestStreamingView::test_no_content_disposition_header PASSED [ 89%]
+test_streaming.py::TestStreamingView::test_response_body_assembles_correctly PASSED [ 92%]
+test_streaming.py::TestStreamingView::test_response_status_200 PASSED    [ 96%]
+test_streaming.py::TestStreamingView::test_storage_404_surfaces_before_stream PASSED [100%]
+
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app\schemas.py:14
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:14: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class UserResponse(BaseModel):
+
+app\schemas.py:28
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:28: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileCreateResponse(BaseModel):
+
+app\schemas.py:39
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileResponse(BaseModel):
+
+app\schemas.py:82
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:82: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ShareDetailResponse(BaseModel):
+
+app\schemas.py:129
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:129: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ActivityLogResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 28 passed, 6 warnings in 1.54s ========================

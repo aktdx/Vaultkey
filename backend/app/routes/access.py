@@ -122,6 +122,7 @@ def check_recipient_access(
 
     if share.revoked:
         log_event(db, share, "ACCESS_DENIED", "DENIED", request)
+        db.commit()
         return RecipientCheckResponse(
             valid=False, original_filename=filename, file_size=file_size,
             expires_at=share.expires_at, max_downloads=share.max_downloads,
@@ -132,6 +133,7 @@ def check_recipient_access(
 
     if share.expires_at and make_aware(share.expires_at) < now:
         log_event(db, share, "LINK_EXPIRED", "DENIED", request)
+        db.commit()
         return RecipientCheckResponse(
             valid=False, original_filename=filename, file_size=file_size,
             expires_at=share.expires_at, max_downloads=share.max_downloads,
@@ -147,6 +149,7 @@ def check_recipient_access(
         and share.download_count >= share.max_downloads
     ):
         log_event(db, share, "ACCESS_DENIED", "DENIED", request)
+        db.commit()
         return RecipientCheckResponse(
             valid=False, original_filename=filename, file_size=file_size,
             expires_at=share.expires_at, max_downloads=share.max_downloads,
@@ -156,6 +159,7 @@ def check_recipient_access(
         )
 
     log_event(db, share, "ACCESS_ATTEMPT", "SUCCESS", request)
+    db.commit()
 
     return RecipientCheckResponse(
         valid=True, original_filename=filename, file_size=file_size,
@@ -194,12 +198,14 @@ def authorize_password(
     if share.password_hash:
         if not payload.password or not verify_password(payload.password.strip(), share.password_hash):
             log_event(db, share, "PASSWORD_FAILED", "FAILED", request)
+            db.commit()
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unable to authorize access with the provided password.",
             )
 
     log_event(db, share, "ACCESS_GRANTED", "SUCCESS", request)
+    db.commit()
     return {"status": "authorized", "message": "Access authorized"}
 
 
@@ -228,6 +234,7 @@ def download_encrypted_file(
 
     if share.revoked:
         log_event(db, share, "ACCESS_DENIED", "DENIED", request)
+        db.commit()
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This VaultKey link has been revoked by its owner.",
@@ -235,6 +242,7 @@ def download_encrypted_file(
 
     if share.expires_at and make_aware(share.expires_at) < datetime.now(timezone.utc):
         log_event(db, share, "LINK_EXPIRED", "DENIED", request)
+        db.commit()
         raise HTTPException(
             status_code=status.HTTP_410_GONE,
             detail="This VaultKey link has expired.",
@@ -247,6 +255,7 @@ def download_encrypted_file(
     # -----------------------------------------------------------------------
     if _is_view_only(share):
         log_event(db, share, "DOWNLOAD_BLOCKED", "DENIED", request)
+        db.commit()
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This share is view-only. Downloading is not permitted.",
@@ -256,6 +265,7 @@ def download_encrypted_file(
     if share.password_hash:
         if not payload.password or not verify_password(payload.password.strip(), share.password_hash):
             log_event(db, share, "PASSWORD_FAILED", "FAILED", request)
+            db.commit()
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unable to authorize access with the provided password.",
@@ -275,16 +285,19 @@ def download_encrypted_file(
 
         if rows_updated == 0:
             log_event(db, share, "ACCESS_DENIED", "DENIED", request)
+            db.commit()
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="The maximum number of downloads for this file has been reached.",
             )
 
-        db.commit()
+        # Counter increment and FILE_DOWNLOADED audit log commit atomically.
         log_event(db, share, "FILE_DOWNLOADED", "SUCCESS", request)
+        db.commit()
     else:
         # max_downloads == 0 with access_mode == 'download' means unlimited downloads.
         log_event(db, share, "FILE_DOWNLOADED", "SUCCESS", request)
+        db.commit()
 
     # Fetch file metadata — all auth checks must pass before opening the R2 stream.
     file_item = db.query(FileItem).filter(FileItem.id == share.file_id).first()
@@ -342,6 +355,7 @@ def view_encrypted_file(
 
     if share.revoked:
         log_event(db, share, "ACCESS_DENIED", "DENIED", request)
+        db.commit()
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This VaultKey link has been revoked by its owner.",
@@ -349,6 +363,7 @@ def view_encrypted_file(
 
     if share.expires_at and make_aware(share.expires_at) < datetime.now(timezone.utc):
         log_event(db, share, "LINK_EXPIRED", "DENIED", request)
+        db.commit()
         raise HTTPException(
             status_code=status.HTTP_410_GONE,
             detail="This VaultKey link has expired.",
@@ -365,6 +380,7 @@ def view_encrypted_file(
     if share.password_hash:
         if not payload.password or not verify_password(payload.password.strip(), share.password_hash):
             log_event(db, share, "PASSWORD_FAILED", "FAILED", request)
+            db.commit()
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unable to authorize access with the provided password.",
@@ -372,6 +388,7 @@ def view_encrypted_file(
 
     # Log that viewing has started (no counter increment)
     log_event(db, share, "VIEW_STARTED", "SUCCESS", request)
+    db.commit()
 
     # Fetch file metadata — all auth checks must pass before opening the R2 stream.
     file_item = db.query(FileItem).filter(FileItem.id == share.file_id).first()
@@ -435,4 +452,5 @@ def report_blocked_action(
     # payload.event is already validated by Pydantic's Literal type — only the
     # five allowed strings can reach this point.
     log_event(db, share, payload.event, "SUCCESS", request)
+    db.commit()
     return {"status": "ok"}

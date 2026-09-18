@@ -53,8 +53,12 @@ def log_event(
     request: Request,
 ) -> None:
     """
-    Persist a single access-log entry for *share* and immediately commit.
-    
+    Stage a single access-log entry for *share*.
+
+    Does NOT commit — the caller owns the transaction boundary.
+    Call db.commit() (or db.flush() if a generated ID is needed first)
+    after log_event() returns.
+
     Args:
         db: Database session
         share: The ShareLink being accessed
@@ -64,7 +68,7 @@ def log_event(
     """
     user_agent = request.headers.get("user-agent")
     client_ip = get_client_ip(request)
-    
+
     db.add(AccessLog(
         share_id=share.id,
         file_id=share.file_id,
@@ -74,4 +78,3 @@ def log_event(
         user_agent=user_agent,
         ip_address=client_ip,
     ))
-    db.commit()

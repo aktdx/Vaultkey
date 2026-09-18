@@ -1,0 +1,42 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Scripts\python.exe
+rootdir: C:\Users\Aamin\Desktop\App\vaultkey\backend
+configfile: pytest.ini
+plugins: anyio-4.14.2
+collecting ... collected 5 items
+
+test_audit_transactions.py::TestAuditTransactions::test_01_successful_download_audit_and_counter_are_consistent PASSED [ 20%]
+test_audit_transactions.py::TestAuditTransactions::test_02_wrong_password_on_download_logs_denial_count_unchanged PASSED [ 40%]
+test_audit_transactions.py::TestAuditTransactions::test_03_revoked_link_logs_access_denied_returns_403 PASSED [ 60%]
+test_audit_transactions.py::TestAuditTransactions::test_04_wrong_password_on_authorize_logs_password_failed_returns_401 PASSED [ 80%]
+test_audit_transactions.py::TestAuditTransactions::test_05_commit_failure_rolls_back_counter_and_audit_log PASSED [100%]
+
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app\schemas.py:14
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:14: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class UserResponse(BaseModel):
+
+app\schemas.py:28
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:28: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileCreateResponse(BaseModel):
+
+app\schemas.py:39
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileResponse(BaseModel):
+
+app\schemas.py:82
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:82: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ShareDetailResponse(BaseModel):
+
+app\schemas.py:129
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:129: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ActivityLogResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 5 passed, 6 warnings in 6.26s ========================
+
+=== Exit code: 0 ===

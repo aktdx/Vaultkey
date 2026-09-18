@@ -67,6 +67,7 @@ def create_share_link(
 
     # Audit log
     log_event(db, share, "LINK_CREATED", "SUCCESS", request)
+    db.commit()
 
     return ShareCreateResponse(
         share_id=share.id,
@@ -195,5 +196,6 @@ def revoke_share_link(
 
         # Audit log
         log_event(db, s, "LINK_REVOKED", "SUCCESS", request)
+        db.commit()
 
     return {"status": "success", "message": "Share link revoked successfully"}

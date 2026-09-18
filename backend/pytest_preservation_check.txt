@@ -1,0 +1,616 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Scripts\python.exe
+rootdir: C:\Users\Aamin\Desktop\App\vaultkey\backend
+configfile: pytest.ini
+plugins: anyio-4.14.2
+collecting ... collected 42 items
+
+test_security_preservation.py::TestIssue2CorsPreservation::test_allowed_origin_receives_cors_header PASSED [  2%]
+test_security_preservation.py::TestIssue2CorsPreservation::test_cors_middleware_expose_headers_config PASSED [  4%]
+test_security_preservation.py::TestIssue2CorsPreservation::test_credentials_allowed_for_configured_origin PASSED [  7%]
+test_security_preservation.py::TestIssue2CorsPreservation::test_expose_headers_contains_iv_hex PASSED [  9%]
+test_security_preservation.py::TestIssue2CorsPreservation::test_expose_headers_contains_original_filename PASSED [ 11%]
+test_security_preservation.py::TestIssue2CorsPreservation::test_health_endpoint_responds_with_200 PASSED [ 14%]
+test_security_preservation.py::TestIssue2CorsPreservation::test_localhost_3000_receives_cors_header PASSED [ 16%]
+test_security_preservation.py::TestIssue3RateLimitingPreservation::test_authorize_endpoint_returns_correct_response_for_no_password_share PASSED [ 19%]
+test_security_preservation.py::TestIssue3RateLimitingPreservation::test_five_authorize_requests_all_get_401_not_429 PASSED [ 21%]
+test_security_preservation.py::TestIssue3RateLimitingPreservation::test_five_download_requests_all_processed_not_429 PASSED [ 23%]
+test_security_preservation.py::TestIssue3RateLimitingPreservation::test_get_check_endpoint_unaffected_by_post_limiters PASSED [ 26%]
+test_security_preservation.py::TestIssue3RateLimitingPreservation::test_limiter_shared_module_unchanged PASSED [ 28%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_encrypt_file_exported PASSED [ 30%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_error_message_describes_binary_mismatch PASSED [ 33%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_error_message_describes_null_byte_issue PASSED [ 35%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_gif_magic_bytes_present_in_lookup PASSED [ 38%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_jpg_jpeg_magic_bytes_present_in_lookup PASSED [ 40%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_on_progress_callback_still_called PASSED [ 42%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_text_extensions_set_present_in_source PASSED [ 45%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_valid_pdf_magic_bytes_present_in_lookup PASSED [ 47%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_valid_png_magic_bytes_present_in_lookup PASSED [ 50%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_validate_file_content_called_before_generate_key PASSED [ 52%]
+test_security_preservation.py::TestIssue5FileValidationPreservation::test_webp_magic_bytes_present_in_lookup PASSED [ 54%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_attempt_logged_on_valid_share_check ERROR [ 57%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_denied_logged_on_revoked_share_check ERROR [ 59%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_denied_on_exhausted_download_limit_check ERROR [ 61%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_granted_logged_on_successful_authorize ERROR [ 64%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_log_event_field_values_match_spec ERROR [ 66%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_link_expired_logged_on_expired_share_check ERROR [ 69%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_log_helper_eliminates_inline_db_add_accesslog ERROR [ 71%]
+test_security_preservation.py::TestIssue8AuditLogPreservation::test_password_failed_logged_on_wrong_password ERROR [ 73%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_access_logs_table_columns_in_database_match_model FAILED [ 76%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_all_model_tables_exist_in_database FAILED [ 78%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_create_all_in_main_py PASSED [ 80%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_create_all_is_noop_on_existing_tables PASSED [ 83%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_files_table_columns_in_database_match_model PASSED [ 85%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_firebase_uid_absent_from_both_schema_and_models PASSED [ 88%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_schema_sql_access_logs_columns_match_model PASSED [ 90%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_schema_sql_last_synced_comment_present PASSED [ 92%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_schema_sql_users_columns_match_model PASSED [ 95%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_shares_table_columns_in_database_match_model FAILED [ 97%]
+test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_users_table_columns_in_database_match_model PASSED [100%]
+
+=================================== ERRORS ====================================
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_access_attempt_logged_on_valid_share_check _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_access_denied_logged_on_revoked_share_check _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_access_denied_on_exhausted_download_limit_check _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_access_granted_logged_on_successful_authorize _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_access_log_event_field_values_match_spec _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_link_expired_logged_on_expired_share_check _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_log_helper_eliminates_inline_db_add_accesslog _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+_ ERROR at setup of TestIssue8AuditLogPreservation.test_password_failed_logged_on_wrong_password _
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+
+The above exception was the direct cause of the following exception:
+test_security_preservation.py:558: in setUpClass
+    user = _bootstrap_user(db, "preserve_audit@vaultkey.app")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_security_preservation.py:65: in _bootstrap_user
+    user = db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+E   LINE 2: FROM users 
+E                ^
+E   
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.email = %(email_1)s 
+E    LIMIT %(param_1)s]
+E   [parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+E   (Background on this error at: https://sqlalche.me/e/20/f405)
+================================== FAILURES ===================================
+_ TestIssue11SchemaSyncPreservation.test_access_logs_table_columns_in_database_match_model _
+test_security_preservation.py:852: in test_access_logs_table_columns_in_database_match_model
+    cols = {c["name"] for c in inspector.get_columns("access_logs")}
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\engine\reflection.py:870: in get_columns
+    col_defs = self.dialect.get_columns(
+<string>:2: in get_columns
+    ???
+venv\Lib\site-packages\sqlalchemy\engine\reflection.py:107: in cache
+    ret = fn(self, con, *args, **kw)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\dialects\postgresql\base.py:3887: in get_columns
+    return self._value_or_raise(data, table_name, schema)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\dialects\postgresql\base.py:3855: in _value_or_raise
+    raise exc.NoSuchTableError(
+E   sqlalchemy.exc.NoSuchTableError: access_logs
+__ TestIssue11SchemaSyncPreservation.test_all_model_tables_exist_in_database __
+test_security_preservation.py:793: in test_all_model_tables_exist_in_database
+    self.assertIn(
+E   AssertionError: 'users' not found in set() : Table 'users' must exist in the live database after create_all
+_ TestIssue11SchemaSyncPreservation.test_shares_table_columns_in_database_match_model _
+test_security_preservation.py:840: in test_shares_table_columns_in_database_match_model
+    self.assertEqual(
+E   AssertionError: Items in the first set but not the second:
+E   'access_mode' : Live shares columns {'download_count', 'revoked_at', 'expires_at', 'access_mode', 'revoked', 'created_at', 'max_downloads', 'token_hash', 'owner_id', 'file_id', 'id', 'password_hash'} do not match expected {'download_count', 'revoked_at', 'expires_at', 'revoked', 'created_at', 'max_downloads', 'token_hash', 'owner_id', 'file_id', 'id', 'password_hash'}
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app\schemas.py:14
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:14: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class UserResponse(BaseModel):
+
+app\schemas.py:28
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:28: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileCreateResponse(BaseModel):
+
+app\schemas.py:39
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FileResponse(BaseModel):
+
+app\schemas.py:82
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:82: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ShareDetailResponse(BaseModel):
+
+app\schemas.py:129
+  C:\Users\Aamin\Desktop\App\vaultkey\backend\app\schemas.py:129: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ActivityLogResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_access_logs_table_columns_in_database_match_model - sqlalchemy.exc.NoSuchTableError: access_logs
+FAILED test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_all_model_tables_exist_in_database - AssertionError: 'users' not found in set() : Table 'users' must exist in the live database after create_all
+FAILED test_security_preservation.py::TestIssue11SchemaSyncPreservation::test_shares_table_columns_in_database_match_model - AssertionError: Items in the first set but not the second:
+'access_mode' : Live shares columns {'download_count', 'revoked_at', 'expires_at', 'access_mode', 'revoked', 'created_at', 'max_downloads', 'token_hash', 'owner_id', 'file_id', 'id', 'password_hash'} do not match expected {'download_count', 'revoked_at', 'expires_at', 'revoked', 'created_at', 'max_downloads', 'token_hash', 'owner_id', 'file_id', 'id', 'password_hash'}
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_attempt_logged_on_valid_share_check - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_denied_logged_on_revoked_share_check - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_denied_on_exhausted_download_limit_check - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_granted_logged_on_successful_authorize - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_access_log_event_field_values_match_spec - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_link_expired_logged_on_expired_share_check - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_log_helper_eliminates_inline_db_add_accesslog - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR test_security_preservation.py::TestIssue8AuditLogPreservation::test_password_failed_logged_on_wrong_password - sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+LINE 2: FROM users 
+             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'preserve_audit@vaultkey.app', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+============= 3 failed, 31 passed, 6 warnings, 8 errors in 43.39s =============
+
+=== Exit code: 1 ===
