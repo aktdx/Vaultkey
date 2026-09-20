@@ -92,7 +92,7 @@ const LandingPage: React.FC = () => {
         />
 
         {/* Content */}
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 flex flex-col items-center text-center">
           <div className="mb-8 inline-flex items-center gap-2.5 px-4 py-2 border border-[rgba(209,208,208,0.1)] rounded-sm bg-[rgba(0,0,0,0.4)] backdrop-blur-sm">
             <div className="w-1.5 h-1.5 rounded-full bg-[#6dbf8c] animate-pulse" />
             <span className="text-[10px] tracking-[0.14em] uppercase text-[rgba(209,208,208,0.6)] font-medium">
@@ -108,7 +108,7 @@ const LandingPage: React.FC = () => {
             <span className="text-[rgba(209,208,208,0.4)]">Stay in control.</span>
           </h1>
 
-          <p className="text-base md:text-lg text-[rgba(209,208,208,0.5)] max-w-xl mx-auto mb-10 leading-relaxed font-light">
+          <p className="text-base md:text-lg text-[rgba(209,208,208,0.5)] w-full max-w-xl mb-10 leading-relaxed font-light text-center">
             End-to-end encrypted file sharing with expiring links, download limits, password protection, and instant revocation.
           </p>
 
@@ -293,12 +293,12 @@ const LandingPage: React.FC = () => {
               <div className="mb-6">
                 <span className="text-[10px] tracking-[0.12em] uppercase text-[rgba(209,208,208,0.4)]">Free</span>
                 <div className="mt-3 flex items-end gap-2">
-                  <span className="text-4xl font-semibold text-[#D1D0D0] tracking-tight">$0</span>
+                  <span className="text-4xl font-semibold text-[#D1D0D0] tracking-tight">₹0</span>
                   <span className="text-sm text-[rgba(209,208,208,0.4)] mb-1">/month</span>
                 </div>
               </div>
               <ul className="space-y-3 mb-8">
-                {['5 files / month', 'Up to 25 MB per file', 'Links expire after 7 days', 'Download limit controls', 'Activity log (7 days)'].map(f => (
+                {['5 files / week', 'Up to 50 MB per file', 'Links expire after 7 days', 'Download limit controls', 'Activity log (7 days)'].map(f => (
                   <li key={f} className="flex items-center gap-3 text-sm text-[rgba(209,208,208,0.6)]">
                     <Check size={13} className="text-[rgba(209,208,208,0.4)] shrink-0" />
                     {f}
@@ -318,12 +318,12 @@ const LandingPage: React.FC = () => {
               <div className="mb-6">
                 <span className="text-[10px] tracking-[0.12em] uppercase text-[rgba(209,208,208,0.4)]">Pro</span>
                 <div className="mt-3 flex items-end gap-2">
-                  <span className="text-4xl font-semibold text-[#D1D0D0] tracking-tight">$12</span>
+                  <span className="text-4xl font-semibold text-[#D1D0D0] tracking-tight">₹199</span>
                   <span className="text-sm text-[rgba(209,208,208,0.4)] mb-1">/month</span>
                 </div>
               </div>
               <ul className="space-y-3 mb-8">
-                {['Unlimited files', 'Up to 5 GB per file', 'Custom expiration dates', 'Password protection', 'Full activity history', 'Priority support'].map(f => (
+                {['Unlimited files', 'Up to 1 GB per file', 'Custom expiration dates', 'Password protection', 'Full activity history', 'Priority support'].map(f => (
                   <li key={f} className="flex items-center gap-3 text-sm text-[rgba(209,208,208,0.6)]">
                     <Check size={13} className="text-[#6dbf8c] shrink-0" />
                     {f}
@@ -347,8 +347,8 @@ const LandingPage: React.FC = () => {
           aria-hidden="true"
         />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <div className="reveal mb-3 inline-flex items-center gap-2">
+        <div className="relative z-10 w-full max-w-3xl mx-auto flex flex-col items-center text-center">
+          <div className="reveal mb-3 flex items-center justify-center gap-2">
             <Shield size={14} className="text-[rgba(209,208,208,0.4)]" />
             <span className="text-[10px] tracking-[0.16em] uppercase text-[rgba(209,208,208,0.35)]">VaultKey</span>
           </div>
@@ -358,7 +358,7 @@ const LandingPage: React.FC = () => {
           >
             Your files deserve<br />serious protection.
           </h2>
-          <p className="reveal reveal-delay-2 text-base text-[rgba(209,208,208,0.45)] max-w-md mx-auto mb-10 leading-relaxed font-light">
+          <p className="reveal reveal-delay-2 text-base text-[rgba(209,208,208,0.45)] w-full max-w-md mb-10 leading-relaxed font-light text-center">
             Start securing your files today. No credit card required.
           </p>
           <div className="reveal reveal-delay-3 flex flex-col sm:flex-row items-center justify-center gap-4">
