@@ -33,14 +33,19 @@ const borders = {
 }
 
 const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined as unknown as ReturnType<typeof setTimeout>)
+  const timerRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     timerRef.current = window.setTimeout(
       () => onRemove(toast.id),
       toast.duration ?? 4500
     )
-    return () => clearTimeout(timerRef.current!)
+
+    return () => {
+      if (timerRef.current !== undefined) {
+        window.clearTimeout(timerRef.current)
+      }
+    }
   }, [toast.id, toast.duration, onRemove])
 
   return (

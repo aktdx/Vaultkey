@@ -97,7 +97,7 @@ Before deploying, ensure you have:
 
 5. **Environment Variables**:
    ```
-   VITE_API_BASE_URL=https://your-backend.railway.app
+   VITE_API_URL=https://your-backend.railway.app
    ```
    (No trailing slash, no `/api` suffix)
 
@@ -116,7 +116,7 @@ Before deploying, ensure you have:
 
 3. **Environment Variables**:
    ```
-   VITE_API_BASE_URL=https://your-backend.railway.app
+   VITE_API_URL=https://your-backend.railway.app
    ```
 
 4. **Deploy**: Netlify will use the `netlify.toml` configuration
@@ -200,11 +200,11 @@ Returns HTTP 503 when degraded.
 
 ### Frontend build fails
 
-**Issue**: `VITE_API_BASE_URL is not defined`  
-**Fix**: Set VITE_API_BASE_URL in deployment platform environment variables
+**Issue**: `VITE_API_URL is not defined`  
+**Fix**: Set VITE_API_URL in deployment platform environment variables
 
 **Issue**: Build succeeds but API calls fail  
-**Fix**: Verify VITE_API_BASE_URL points to your backend (check browser Network tab)
+**Fix**: Verify v points to your backend (check browser Network tab)
 
 ### CORS errors
 

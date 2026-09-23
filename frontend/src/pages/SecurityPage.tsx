@@ -13,7 +13,7 @@ interface ArchStep {
 const archSteps: ArchStep[] = [
   { from: 'Browser', to: 'Web Crypto API', label: 'File selected', detail: 'File read into ArrayBuffer in the browser — never leaves the tab until encrypted' },
   { from: 'Web Crypto API', to: 'Encrypted Blob', label: 'AES-256-GCM encryption', detail: 'generateKey() → random 256-bit key + 96-bit IV → encrypt() → authenticated ciphertext' },
-  { from: 'Encrypted Blob', to: 'Supabase Storage', label: 'Encrypted upload', detail: 'Only the ciphertext (with IV prepended) is transmitted. The key is never sent.' },
+  { from: 'Encrypted Blob', to: 'Cloudflare R2', label: 'Encrypted upload', detail: 'Only the ciphertext (with IV prepended) is transmitted. The key is never sent.' },
   { from: 'VaultKey', to: 'Share URL', label: 'Zero-knowledge key delivery', detail: 'Key is appended to the URL fragment: /s/{token}#key={base64url_key}. Fragments are not sent in HTTP requests.' },
   { from: 'Recipient Browser', to: 'Decrypted File', label: 'Client-side decryption', detail: 'Fragment key is parsed → AES-256-GCM decryption in browser → file downloaded locally' },
 ]
@@ -133,7 +133,7 @@ const SecurityPage: React.FC = () => (
             {[
               'If you share the URL (including its fragment) publicly, anyone with it can decrypt the file.',
               'VaultKey does not encrypt file metadata such as filename, size, or MIME type in the current version.',
-              'Supabase has access to the encrypted ciphertext, but not the decryption key.',
+              'Cloudflare R2 stores the encrypted ciphertext, but never receives the decryption key.',
               'If a recipient copies the decryption key from the URL fragment, they can decrypt the file even after revocation (from locally cached data).',
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3">

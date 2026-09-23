@@ -103,7 +103,7 @@ The frontend dev server will start at `http://localhost:5173`.
 
 ### Frontend (Vercel / Netlify)
 
-1. Set `VITE_API_BASE_URL` to your backend URL
+1. Set `VITE_API_URL` to your backend URL
 2. Build command: `npm run build`
 3. Output directory: `dist`
 4. Deploy from the `frontend` directory

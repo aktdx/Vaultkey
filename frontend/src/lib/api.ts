@@ -1,6 +1,6 @@
 /**
  * VaultKey — FastAPI Backend API Client
- * Replaces Supabase calls with direct FastAPI + Neon + Cloudflare R2 calls.
+ * Direct FastAPI + Neon + Cloudflare R2 client.
  *
  * Base URL driven by VITE_API_URL env variable.
  * Auth: Bearer JWT stored in localStorage.

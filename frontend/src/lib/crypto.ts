@@ -94,6 +94,8 @@ const EXTENSION_TO_MIME: Record<string, string> = {
   '.log':  'text/plain',
 }
 
+const GENERIC_MIME = 'application/octet-stream'
+
 /**
  * Resolves the MIME type for a decrypted file using a three-step fallback:
  *   1. Use the server-supplied MIME type (stored at upload time, from X-Mime-Type header).
@@ -101,13 +103,14 @@ const EXTENSION_TO_MIME: Record<string, string> = {
  *   3. Fall back to application/octet-stream.
  */
 export function resolveMimeType(serverMimeType: string | null | undefined, filename = ''): string {
-  if (serverMimeType?.trim()) return serverMimeType.trim()
+  const server = serverMimeType?.trim()
+  if (server && server !== GENERIC_MIME) return server
   const dotIndex = filename.lastIndexOf('.')
   if (dotIndex !== -1) {
     const mapped = EXTENSION_TO_MIME[filename.slice(dotIndex).toLowerCase()]
     if (mapped) return mapped
   }
-  return 'application/octet-stream'
+  return GENERIC_MIME
 }
 
 // ── Key generation / import / export ─────────────────────────────────────────

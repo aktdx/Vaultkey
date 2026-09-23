@@ -64,3 +64,5 @@ Thumbs.db
 *.swp
 *.swo
 overview.md 
+
+backend/app/__pycache__/*

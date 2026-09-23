@@ -59,12 +59,16 @@ def _is_view_only(share: ShareLink) -> bool:
     return _share_access_mode(share) == AccessMode.VIEW_ONLY.value
 
 
+_GENERIC_MIME = "application/octet-stream"
+
+
 def _resolve_mime(file_item: FileItem) -> str:
     """Return the MIME type for a file, falling back to extension lookup."""
-    if file_item.mime_type:
-        return file_item.mime_type
+    stored = (file_item.mime_type or "").strip()
+    if stored and stored != _GENERIC_MIME:
+        return stored
     ext = os.path.splitext(file_item.original_filename)[1].lower()
-    return _EXT_MIME_FALLBACK.get(ext, "application/octet-stream")
+    return _EXT_MIME_FALLBACK.get(ext, _GENERIC_MIME)
 
 
 def _stream_body(body):

@@ -1,0 +1,94 @@
+# Implementation Plan
+
+- [ ] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Generic MIME Type Not Overridden by Extension
+  - **CRITICAL**: This test MUST FAIL on unfixed code — failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior — it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists in both backend and frontend helpers
+  - **Scoped PBT Approach**: For deterministic bugs, scope the property to the concrete failing cases to ensure reproducibility
+  - **Backend test** (`backend/`): Call `_resolve_mime(FileItem(mime_type="application/octet-stream", original_filename="report.pdf"))` and assert the result is `"application/pdf"` — on unfixed code this returns `"application/octet-stream"` (confirms root cause #1)
+  - **Frontend test** (`frontend/`): Call `resolveMimeType("application/octet-stream", "report.pdf")` and assert the result is `"application/pdf"` — on unfixed code this returns `"application/octet-stream"` (confirms root cause #2)
+  - Also test: `_resolve_mime(FileItem(mime_type="application/octet-stream", original_filename="photo.png"))` → assert `"image/png"`
+  - Also test: `resolveMimeType("application/octet-stream", "photo.png")` → assert `"image/png"`
+  - Boundary (should pass even on unfixed code): `_resolve_mime(FileItem(mime_type="application/octet-stream", original_filename="archive.xyz"))` → assert `"application/octet-stream"` (no extension match — correct final fallback)
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests FAIL for PDF/PNG cases (this is correct — it proves the bug exists); boundary case PASSES
+  - Document counterexamples found (e.g., `resolveMimeType("application/octet-stream", "report.pdf")` returns `"application/octet-stream"` instead of `"application/pdf"`)
+  - Mark task complete when tests are written, run, and failures are documented
+  - _Requirements: 1.1, 1.2, 1.3, 1.4_
+
+- [ ] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Specific MIME Types Are Not Overridden
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy inputs (where `isBugCondition` is false):
+    - Observe: `resolveMimeType("image/png", "photo.png")` → `"image/png"` (specific stored type preserved)
+    - Observe: `resolveMimeType("application/pdf", "report.pdf")` → `"application/pdf"` (correctly stored PDF preserved)
+    - Observe: `resolveMimeType(null, "report.pdf")` → `"application/pdf"` (null server value → extension lookup)
+    - Observe: `resolveMimeType(null, "archive.xyz")` → `"application/octet-stream"` (null + unknown ext → final default)
+    - Observe: `resolveMimeType("application/octet-stream", "archive.xyz")` → `"application/octet-stream"` (no known ext → final default preserved)
+    - Observe: `resolveMimeType("text/plain", "notes.txt")` → `"text/plain"` (specific text type preserved)
+  - **Property-based tests** — generate inputs where `serverMimeType` is a specific non-generic value (not `"application/octet-stream"`, not null/empty) and assert the fixed function returns the same value as the original
+  - **Property-based tests** — generate filenames with no extension or unmapped extensions paired with null/octet-stream server type and assert result is `"application/octet-stream"`
+  - Write equivalent preservation tests for the backend `_resolve_mime()`:
+    - Files with specific stored `mime_type` (e.g., `"image/png"`) must still return that value unchanged
+    - Files with null/empty `mime_type` and known extension must still use extension lookup
+    - Files with `"application/octet-stream"` stored AND unknown extension must still return `"application/octet-stream"`
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.6_
+
+- [ ] 3. Fix incorrect MIME type resolution for octet-stream stored files
+
+  - [ ] 3.1 Fix `_resolve_mime()` in `backend/app/routes/access.py`
+    - Add module-level constant `_GENERIC_MIME = "application/octet-stream"` before the function
+    - Change the guard from `if file_item.mime_type:` to `if stored and stored != _GENERIC_MIME:` where `stored = (file_item.mime_type or "").strip()`
+    - This ensures files with `mime_type = "application/octet-stream"` in the database fall through to the extension lookup (`_EXT_MIME_FALLBACK`) instead of returning the generic type directly
+    - Files with specific stored MIME types (e.g., `"image/png"`, `"text/plain"`) are unaffected — the `stored != _GENERIC_MIME` guard passes them through immediately
+    - Files with null or empty `mime_type` already fell through before; behavior unchanged
+    - _Bug_Condition: `isBugCondition(file_item)` where `file_item.mime_type == "application/octet-stream"` AND `original_filename` has a known extension_
+    - _Expected_Behavior: `_resolve_mime(file_item)` returns `_EXT_MIME_FALLBACK[ext]` (e.g., `"application/pdf"` for `.pdf`) instead of `"application/octet-stream"`_
+    - _Preservation: Files with specific stored `mime_type` continue to return that value; files with unknown extensions continue to return `"application/octet-stream"`_
+    - _Requirements: 2.1, 3.1, 3.2, 3.3_
+
+  - [ ] 3.2 Fix `resolveMimeType()` in `frontend/src/lib/crypto.ts`
+    - Add module-level constant `const GENERIC_MIME = 'application/octet-stream'` before the function
+    - Change the first guard from `if (serverMimeType?.trim()) return serverMimeType.trim()` to `if (server && server !== GENERIC_MIME) return server` where `const server = serverMimeType?.trim()`
+    - This ensures `"application/octet-stream"` from the `X-Mime-Type` header falls through to the `EXTENSION_TO_MIME` lookup on the filename instead of being returned directly
+    - Non-generic server values (e.g., `"image/png"`, `"application/pdf"`) are returned immediately — no change in behavior for those inputs
+    - Null, undefined, and empty string server values already fell through before; behavior unchanged
+    - _Bug_Condition: `isBugCondition(input)` where `input.serverMimeType == "application/octet-stream"` AND `input.filename` has a known extension in `EXTENSION_TO_MIME`_
+    - _Expected_Behavior: `resolveMimeType("application/octet-stream", filename)` returns `EXTENSION_TO_MIME[ext]` (e.g., `"application/pdf"` for `"report.pdf"`)_
+    - _Preservation: Non-generic server MIME types continue to be returned unchanged; null/empty server values continue to use extension fallback; unknown extensions continue to return `"application/octet-stream"`_
+    - _Requirements: 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.6_
+
+  - [ ] 3.3 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Generic MIME Type Overridden by Extension
+    - **IMPORTANT**: Re-run the SAME tests from task 1 — do NOT write new tests
+    - The tests from task 1 encode the expected behavior; passing them confirms the fix is correct
+    - Re-run: `_resolve_mime(FileItem(mime_type="application/octet-stream", original_filename="report.pdf"))` → now asserts `"application/pdf"` ✓
+    - Re-run: `resolveMimeType("application/octet-stream", "report.pdf")` → now asserts `"application/pdf"` ✓
+    - Re-run: `_resolve_mime(FileItem(mime_type="application/octet-stream", original_filename="photo.png"))` → now asserts `"image/png"` ✓
+    - Re-run: `resolveMimeType("application/octet-stream", "photo.png")` → now asserts `"image/png"` ✓
+    - Re-run boundary case: still returns `"application/octet-stream"` for `"archive.xyz"` ✓
+    - **EXPECTED OUTCOME**: All tests PASS (confirms bug is fixed)
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+
+  - [ ] 3.4 Verify preservation tests still pass
+    - **Property 2: Preservation** - Specific MIME Types Are Not Overridden
+    - **IMPORTANT**: Re-run the SAME tests from task 2 — do NOT write new tests
+    - Run all preservation property tests from step 2 against the fixed code
+    - **EXPECTED OUTCOME**: All tests PASS (confirms no regressions introduced by the fix)
+    - Confirm: files with specific stored `mime_type` still use that value unchanged
+    - Confirm: files with null/empty server value still use extension lookup
+    - Confirm: files with unknown extensions still fall back to `"application/octet-stream"`
+    - Confirm: `"application/octet-stream"` + unknown extension still returns `"application/octet-stream"` (correct final fallback, not a regression)
+
+- [ ] 4. Checkpoint — Ensure all tests pass
+  - Run the full backend test suite: `pytest` in `backend/`
+  - Run the full frontend test suite (e.g., `vitest --run`) in `frontend/`
+  - Confirm Property 1 (bug condition) tests pass — bug is resolved
+  - Confirm Property 2 (preservation) tests pass — no regressions
+  - Ensure all other existing tests continue to pass (VIEW_ONLY enforcement, download counter, expiry, password checks, audit logging)
+  - Ask the user if any questions arise
