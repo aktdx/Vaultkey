@@ -19,7 +19,9 @@ export function formatDate(date: string | Date): string {
 }
 
 export function formatRelativeTime(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date
+  const d = typeof date === 'string'
+    ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(date) ? date : `${date}Z`)
+    : date
   const now = new Date()
   const diff = (now.getTime() - d.getTime()) / 1000
   if (diff < 60) return 'just now'
