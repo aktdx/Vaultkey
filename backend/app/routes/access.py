@@ -162,7 +162,7 @@ def check_recipient_access(
             revoked=False, status="LIMIT_REACHED",
         )
 
-    log_event(db, share, "ACCESS_ATTEMPT", "SUCCESS", request)
+    log_event(db, share, "METADATA_CHECK", "SUCCESS", request)
     db.commit()
 
     return RecipientCheckResponse(
@@ -173,6 +173,33 @@ def check_recipient_access(
         requires_password=share.password_hash is not None,
         revoked=False, status="OK",
     )
+
+
+@router.post("/{token}/attempt")
+@limiter.limit("5/minute")
+def record_access_attempt(
+    token: str,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    share = get_share_by_token(token, db)
+
+    if not share:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid share token")
+    if share.revoked:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access revoked")
+    if share.expires_at and make_aware(share.expires_at) < datetime.now(timezone.utc):
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Link expired")
+    if (
+        not _is_view_only(share)
+        and share.max_downloads > 0
+        and share.download_count >= share.max_downloads
+    ):
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Download limit reached")
+
+    log_event(db, share, "ACCESS_ATTEMPT", "SUCCESS", request)
+    db.commit()
+    return {"status": "logged"}
 
 
 @router.post("/{token}/authorize")

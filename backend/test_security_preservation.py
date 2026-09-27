@@ -591,13 +591,27 @@ class TestIssue8AuditLogPreservation(unittest.TestCase):
             .first()
         )
 
-    def test_access_attempt_logged_on_valid_share_check(self):
+    def test_metadata_check_logged_on_valid_share_check(self):
         """
         Requirement 3.2: GET /api/access/{token} on a valid share must
-        produce an ACCESS_ATTEMPT / SUCCESS record.
+        produce a METADATA_CHECK / SUCCESS record.
         """
         share, raw_token = self._fresh_share()
         resp = client.get(f"/api/access/{raw_token}")
+        self.assertEqual(resp.status_code, 200)
+
+        db = _db()
+        try:
+            db.expire_all()
+            log = self._latest_log(db, share.id, "METADATA_CHECK")
+            self._assert_log_complete(log, "METADATA_CHECK")
+            self.assertEqual(log.status, "SUCCESS")
+        finally:
+            db.close()
+
+    def test_access_attempt_logged_on_valid_share_attempt(self):
+        share, raw_token = self._fresh_share()
+        resp = client.post(f"/api/access/{raw_token}/attempt")
         self.assertEqual(resp.status_code, 200)
 
         db = _db()
@@ -739,6 +753,7 @@ class TestIssue8AuditLogPreservation(unittest.TestCase):
         """
         access_source = _read_source("backend/app/routes/access.py")
         expected_events = [
+            "METADATA_CHECK",
             "ACCESS_ATTEMPT",
             "ACCESS_GRANTED",
             "ACCESS_DENIED",

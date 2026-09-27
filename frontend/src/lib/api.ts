@@ -255,6 +255,10 @@ export async function apiCheckAccess(token: string): Promise<ApiAccessCheck> {
   return apiFetch<ApiAccessCheck>(`/api/access/${token}`, {}, false)
 }
 
+export async function apiRecordAccessAttempt(token: string): Promise<void> {
+  await apiFetch<void>(`/api/access/${token}/attempt`, { method: 'POST' }, false)
+}
+
 export async function apiAuthorizePassword(
   token: string,
   password: string

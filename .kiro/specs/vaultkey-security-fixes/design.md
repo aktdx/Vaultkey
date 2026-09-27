@@ -178,7 +178,7 @@ END FUNCTION
 ```
 
 **Examples:**
-- `ACCESS_ATTEMPT` log omits `ip_address` at one call site due to copy-paste deviation → inconsistent audit record. *(bug)*
+- `METADATA_CHECK` log omits `ip_address` at one call site due to copy-paste deviation → inconsistent audit record. *(bug)*
 - All events go through `_log_event(db, share, event, status, request)` → fields uniformly populated. *(fixed)*
 
 ---
@@ -685,7 +685,7 @@ END FOR
 4. **Valid share link download** — Full flow: check → authorize → download with valid token → encrypted blob returned with correct headers. *(validates 3.6)*
 5. **Genuine PDF encrypts** — `encryptFile(realPdfFile)` → returns `{ encryptedBlob, ivHex, keyHex }` without error. *(validates 3.7)*
 6. **File deletion success** — `DELETE /api/files/{id}` where file exists → 200, no logger error call. *(validates 3.9)*
-7. **All audit event types recorded** — Trigger `ACCESS_DENIED`, `LINK_EXPIRED`, `ACCESS_ATTEMPT`, `PASSWORD_FAILED`, `ACCESS_GRANTED`, `FILE_DOWNLOADED` → all appear in `access_logs` with complete fields. *(validates 3.10)*
+7. **All audit event types recorded** — Trigger `ACCESS_DENIED`, `LINK_EXPIRED`, `METADATA_CHECK`, `ACCESS_ATTEMPT`, `PASSWORD_FAILED`, `ACCESS_GRANTED`, `FILE_DOWNLOADED` → all appear in `access_logs` with complete fields. *(validates 3.10)*
 8. **Allowed origin passes CORS** — Request from `http://localhost:5173` → appropriate CORS headers present. *(validates 3.2)*
 9. **Requests within rate limit window pass** — 5 requests from same IP → all processed normally. *(validates 3.3)*
 10. **Route imports succeed** — All 5 routers (`auth`, `files`, `shares`, `access`, `activity`) import without error after `__init__.py` is added. *(validates 3.12)*

@@ -83,7 +83,7 @@ class AccessLog(Base):
     share_id = Column(String(36), ForeignKey("shares.id", ondelete="CASCADE"), nullable=True)
     file_id = Column(String(36), ForeignKey("files.id", ondelete="CASCADE"), nullable=True)
     owner_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    event = Column(String(50), nullable=False)  # LINK_CREATED, ACCESS_ATTEMPT, ACCESS_GRANTED, ACCESS_DENIED, PASSWORD_FAILED, FILE_DOWNLOADED, FILE_VIEWED, VIEW_STARTED, VIEW_COMPLETED, PRINT_BLOCKED, DOWNLOAD_BLOCKED, SAVE_ATTEMPT_BLOCKED, LINK_EXPIRED, LINK_REVOKED
+    event = Column(String(50), nullable=False)  # LINK_CREATED, METADATA_CHECK, ACCESS_ATTEMPT, ACCESS_GRANTED, ACCESS_DENIED, PASSWORD_FAILED, FILE_DOWNLOADED, FILE_VIEWED, VIEW_STARTED, VIEW_COMPLETED, PRINT_BLOCKED, DOWNLOAD_BLOCKED, SAVE_ATTEMPT_BLOCKED, LINK_EXPIRED, LINK_REVOKED
     status = Column(String(20), nullable=False) # SUCCESS, DENIED, FAILED
     user_agent = Column(String(512), nullable=True)
     ip_address = Column(String(100), nullable=True)

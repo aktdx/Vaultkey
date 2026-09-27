@@ -79,7 +79,7 @@
   - Write property-based test: for all files whose bytes match their declared extension, `encryptFile` always succeeds
 
   Observe and encode preservation for existing audit log entries (Issue 8 — 3.1, 3.2):
-  - Trigger `ACCESS_ATTEMPT` (via `GET /api/access/{token}`), `ACCESS_GRANTED`, `PASSWORD_FAILED`, `FILE_DOWNLOADED`, `FILE_VIEWED`, `ACCESS_DENIED` (via download limit reached) events
+  - Trigger `METADATA_CHECK` (via `GET /api/access/{token}`), `ACCESS_ATTEMPT` (via `POST /api/access/{token}/attempt`), `ACCESS_GRANTED`, `PASSWORD_FAILED`, `FILE_DOWNLOADED`, `FILE_VIEWED`, `ACCESS_DENIED` (via download limit reached) events
   - Query `access_logs` after each; verify every record has non-null `share_id`, `file_id`, `owner_id`, `event`, `status`, `user_agent`, `ip_address`
   - Write property: for all event types already logged, AccessLog records are complete with all required fields
 
@@ -230,7 +230,7 @@
       `_log_event(db, share, "LINK_EXPIRED", "DENIED", request)`
     - _Bug_Condition: isBugCondition_8(request) — share.revoked=true OR share.expired=true AND no AccessLog written_
     - _Expected_Behavior: ACCESS_DENIED written before revoked 403; LINK_EXPIRED written before expired 410_
-    - _Preservation: All previously logged event types (ACCESS_ATTEMPT, ACCESS_GRANTED, PASSWORD_FAILED, FILE_DOWNLOADED, FILE_VIEWED, ACCESS_DENIED for download-limit) still recorded with complete fields_
+    - _Preservation: All previously logged event types (METADATA_CHECK, ACCESS_ATTEMPT, ACCESS_GRANTED, PASSWORD_FAILED, FILE_DOWNLOADED, FILE_VIEWED, ACCESS_DENIED for download-limit) still recorded with complete fields_
     - _Requirements: 2.1, 2.2, 2.3_
 
   - [x] 6.3 Verify bug condition exploration test now passes for Issue 8
@@ -245,7 +245,7 @@
   - [x] 6.4 Verify preservation tests still pass after Issue 8 fix
     - **Property 2: Preservation** - All Existing Audit Events Still Recorded With Complete Fields
     - **IMPORTANT**: Re-run the SAME tests from task 2 (Issue 8 preservation) — do NOT write new tests
-    - Trigger `ACCESS_ATTEMPT`, `ACCESS_GRANTED`, `PASSWORD_FAILED`, `FILE_DOWNLOADED`, `FILE_VIEWED`, `ACCESS_DENIED` (download-limit) events
+    - Trigger `METADATA_CHECK`, `ACCESS_ATTEMPT`, `ACCESS_GRANTED`, `PASSWORD_FAILED`, `FILE_DOWNLOADED`, `FILE_VIEWED`, `ACCESS_DENIED` (download-limit) events
     - Verify every resulting AccessLog record has non-null `share_id`, `file_id`, `owner_id`, `event`, `status`, `user_agent`, `ip_address`
     - Write property: for all event types, AccessLog records are complete with no fields regressed to null
     - **EXPECTED OUTCOME**: Tests PASS (no regressions)

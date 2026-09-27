@@ -8,14 +8,14 @@
  *   • Decryption key lives only in window.location.hash — never sent to server.
  *   • download flow: AES-256-GCM decrypt in browser → temporary anchor click → revoke URL.
  */
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   Shield, FileText, Lock, Clock, Hash,
   Download, CheckCircle2, AlertCircle, Eye, EyeOff,
 } from 'lucide-react'
 import { getShareByToken, authorizePassword, downloadAndDecrypt, viewAndDecrypt } from '../lib/shares'
-import { apiReportBlockedAction } from '../lib/api'
+import { apiRecordAccessAttempt, apiReportBlockedAction } from '../lib/api'
 import { extractKeyFromFragment } from '../lib/utils'
 import { ViewOnlyViewer } from '../components/shares/ViewOnlyViewer'
 import type { ApiAccessCheck } from '../lib/api'
@@ -55,15 +55,19 @@ export function SecureDownloadPage() {
   const [viewerFilename, setViewerFilename] = useState('')
   const [viewerMime, setViewerMime] = useState('')
   const [showViewer, setShowViewer] = useState(false)
+  const initialAccessToken = useRef<string | null>(null)
 
   // ── Fetch share metadata ────────────────────────────────────────────────────
-  const fetchAccessState = useCallback(async () => {
+  const fetchAccessState = useCallback(async (recordAttempt = false) => {
     if (!token) return
     setLoading(true)
     setErrorMsg('')
     try {
       const data = await getShareByToken(token)
       setAccessData(data)
+      if (recordAttempt && data?.valid) {
+        apiRecordAccessAttempt(token).catch(() => {/* ignore audit-report errors */})
+      }
     } catch (err) {
       setErrorMsg((err as Error).message || 'Failed to contact VaultKey server.')
     } finally {
@@ -72,7 +76,10 @@ export function SecureDownloadPage() {
   }, [token])
 
   useEffect(() => {
-    if (token) fetchAccessState()
+    if (token && initialAccessToken.current !== token) {
+      initialAccessToken.current = token
+      fetchAccessState(true)
+    }
   }, [token, fetchAccessState])
 
   const isViewOnly = accessData?.access_mode === 'view_only'

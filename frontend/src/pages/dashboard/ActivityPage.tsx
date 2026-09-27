@@ -18,6 +18,8 @@ const eventConfig: Record<string, {
   SHARE_CREATED:          { icon: <Share2 size={13} />,      iconClass: 'text-[#7baee8]',               badgeVariant: 'info',     label: 'Share created' },
   file_downloaded:        { icon: <Download size={13} />,    iconClass: 'text-[#6dbf8c]',               badgeVariant: 'success',  label: 'Downloaded' },
   FILE_DOWNLOADED:        { icon: <Download size={13} />,    iconClass: 'text-[#6dbf8c]',               badgeVariant: 'success',  label: 'Downloaded' },
+  METADATA_CHECK:         { icon: <Shield size={13} />,      iconClass: 'text-[#7baee8]',               badgeVariant: 'info',     label: 'Metadata checked' },
+  ACCESS_ATTEMPT:         { icon: <Shield size={13} />,      iconClass: 'text-[#7baee8]',               badgeVariant: 'info',     label: 'Access attempt' },
   share_accessed:         { icon: <Shield size={13} />,      iconClass: 'text-[#7baee8]',               badgeVariant: 'info',     label: 'Accessed' },
   SHARE_ACCESSED:         { icon: <Shield size={13} />,      iconClass: 'text-[#7baee8]',               badgeVariant: 'info',     label: 'Accessed' },
   password_verified:      { icon: <Shield size={13} />,      iconClass: 'text-[#6dbf8c]',               badgeVariant: 'success',  label: 'Auth OK' },

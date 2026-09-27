@@ -178,7 +178,7 @@ END FOR
 
 #### Unchanged Behavior (Regression Prevention)
 
-3.1 WHEN an `ACCESS_DENIED`, `LINK_EXPIRED`, `PASSWORD_FAILED`, `ACCESS_GRANTED`, `FILE_DOWNLOADED`, `FILE_VIEWED`, or `ACCESS_ATTEMPT` event occurs THEN the system SHALL CONTINUE TO persist the same fields (share_id, file_id, owner_id, event, status, user_agent, ip_address) as before.
+3.1 WHEN an `ACCESS_DENIED`, `LINK_EXPIRED`, `PASSWORD_FAILED`, `ACCESS_GRANTED`, `FILE_DOWNLOADED`, `FILE_VIEWED`, `METADATA_CHECK`, or `ACCESS_ATTEMPT` event occurs THEN the system SHALL CONTINUE TO persist the same fields (share_id, file_id, owner_id, event, status, user_agent, ip_address) as before.
 
 3.2 WHEN the `check_recipient_access` endpoint logs events THEN the system SHALL CONTINUE TO produce identical log records to those produced before the refactor.
 
