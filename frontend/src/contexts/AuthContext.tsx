@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth'
+import { auth, googleProvider } from '../lib/firebase'
 import {
   apiLogin,
   apiRegister,
   apiGetMe,
+  apiGoogleAuth,
   setToken,
   clearToken,
   getToken,
@@ -20,6 +23,23 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
+
+// Map Firebase auth error codes to user-friendly messages.
+function googleErrorMessage(code: string): string {
+  switch (code) {
+    case 'auth/popup-closed-by-user':
+    case 'auth/cancelled-popup-request':
+      return 'Sign-in cancelled.'
+    case 'auth/popup-blocked':
+      return 'Pop-up was blocked by your browser. Please allow pop-ups for this site and try again.'
+    case 'auth/account-exists-with-different-credential':
+      return 'An account already exists with this email. Please sign in with your original method.'
+    case 'auth/network-request-failed':
+      return 'Network error. Check your connection and try again.'
+    default:
+      return 'Google sign-in failed. Please try again.'
+  }
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<ApiUser | null>(null)
@@ -61,11 +81,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = () => {
     clearToken()
     setUser(null)
+    // Clear Firebase client session; failure is non-fatal for VaultKey logout
+    firebaseSignOut(auth).catch(() => {/* no-op */})
   }
 
-  // Google OAuth is not implemented in the FastAPI backend — show a notice
   const signInWithGoogle = async (): Promise<{ error: string | null }> => {
-    return { error: 'Google sign-in is not available with the FastAPI backend. Use email/password.' }
+    try {
+      const result = await signInWithPopup(auth, googleProvider)
+      const idToken = await result.user.getIdToken(/* forceRefresh */ true)
+      const res = await apiGoogleAuth(idToken)
+      setToken(res.access_token)
+      setUser(res.user)
+      return { error: null }
+    } catch (e: unknown) {
+      // Firebase errors carry a `code` property
+      const code = (e as { code?: string }).code ?? ''
+      if (code.startsWith('auth/')) {
+        return { error: googleErrorMessage(code) }
+      }
+      // Backend error (apiGoogleAuth threw)
+      return { error: e instanceof Error ? e.message : 'Google sign-in failed. Please try again.' }
+    }
   }
 
   const resetPassword = async (_email: string): Promise<{ error: string | null }> => {

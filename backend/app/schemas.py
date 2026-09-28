@@ -24,6 +24,9 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     user: UserResponse
 
+class GoogleAuthRequest(BaseModel):
+    id_token: str
+
 # File Schemas
 class FileCreateResponse(BaseModel):
     id: str

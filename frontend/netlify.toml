@@ -17,6 +17,10 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    # Allow Firebase OAuth popups to communicate back to this page.
+    # "same-origin-allow-popups" lets popups opened from this origin (Firebase auth)
+    # use window references without being blocked by COOP.
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
 
 # Cache static assets
 [[headers]]

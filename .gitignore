@@ -42,14 +42,12 @@ htmlcov/
 
 # ── Local SQLite remnants (no longer used in production) ─────
 backend/vaultkey.db
-backend/storage/
 
 # ── Node / Frontend ──────────────────────────────────────────
 node_modules/
 frontend/node_modules/
 frontend/.vite/
 frontend/node_modules/.vite/
-frontend/package-lock.json
 frontend/dist/
 *.log
 npm-debug.log*
@@ -66,3 +64,8 @@ Thumbs.db
 overview.md 
 
 backend/app/__pycache__/*
+
+# Firebase Admin credentials
+firebase-service-account*.json
+*-firebase-adminsdk-*.json
+service-account*.json
