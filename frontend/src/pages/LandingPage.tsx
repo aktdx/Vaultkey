@@ -93,7 +93,7 @@ const LandingPage: React.FC = () => {
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-4xl mx-auto px-6 flex flex-col items-center text-center">
-          <div className="mb-8 inline-flex items-center gap-2.5 px-4 py-2 border border-[rgba(209,208,208,0.1)] rounded-sm bg-[rgba(0,0,0,0.4)] backdrop-blur-sm">
+          <div className="mb-10 inline-flex items-center gap-2.5 px-4 py-2 border border-[rgba(209,208,208,0.1)] rounded-sm bg-[rgba(0,0,0,0.4)] backdrop-blur-sm">
             <div className="w-1.5 h-1.5 rounded-full bg-[#6dbf8c] animate-pulse" />
             <span className="text-[10px] tracking-[0.14em] uppercase text-[rgba(209,208,208,0.6)] font-medium">
               AES-256-GCM · Browser-side encryption · Zero-knowledge
@@ -101,18 +101,18 @@ const LandingPage: React.FC = () => {
           </div>
 
           <h1
-            className="font-semibold text-[#D1D0D0] mb-6"
-            style={{ fontSize: 'clamp(2.8rem, 7vw, 6.5rem)', lineHeight: '0.95', letterSpacing: '-0.04em' }}
+            className="font-semibold text-[#D1D0D0] mb-8"
+            style={{ fontSize: 'clamp(2.8rem, 7vw, 6.5rem)', lineHeight: '1.0', letterSpacing: '-0.04em' }}
           >
-            Share securely.<br />
-            <span className="text-[rgba(209,208,208,0.4)]">Stay in control.</span>
+            Share securely<br />
+            <span className="text-[rgba(209,208,208,0.4)]">Stay in control</span>
           </h1>
 
           <p className="text-base md:text-lg text-[rgba(209,208,208,0.5)] w-full max-w-xl mb-10 leading-relaxed font-light text-center">
             End-to-end encrypted file sharing with expiring links, download limits, password protection, and instant revocation.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link to="/auth/signup">
               <Button
                 variant="primary"
@@ -123,15 +123,15 @@ const LandingPage: React.FC = () => {
                 Secure your first file
               </Button>
             </Link>
-            <a href="#how-it-works">
+            <Link to="/how-it-works">
               <Button variant="ghost" size="lg" rightIcon={<ChevronDown size={15} />}>
                 See how it works
               </Button>
-            </a>
+            </Link>
           </div>
 
           {/* Trust indicators */}
-          <div className="mt-16 flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
             {['AES-256-GCM Encrypted', 'Zero-knowledge delivery', 'Instant revocation', 'No tracking'].map(item => (
               <div key={item} className="flex items-center gap-2">
                 <Check size={12} className="text-[rgba(209,208,208,0.4)]" />
@@ -318,7 +318,7 @@ const LandingPage: React.FC = () => {
               <div className="mb-6">
                 <span className="text-[10px] tracking-[0.12em] uppercase text-[rgba(209,208,208,0.4)]">Pro</span>
                 <div className="mt-3 flex items-end gap-2">
-                  <span className="text-4xl font-semibold text-[#D1D0D0] tracking-tight">₹199</span>
+                  <span className="text-4xl font-semibold text-[#D1D0D0] tracking-tight">₹299</span>
                   <span className="text-sm text-[rgba(209,208,208,0.4)] mb-1">/month</span>
                 </div>
               </div>

@@ -6,6 +6,8 @@ import { ToastProvider } from './contexts/ToastContext'
 // Lazy-loaded pages
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const SecurityPage = lazy(() => import('./pages/SecurityPage'))
+const HowItWorksPage = lazy(() => import('./pages/HowItWorksPage'))
+const PricingPage = lazy(() => import('./pages/PricingPage'))
 const SecureDownloadPage = lazy(() => import('./pages/SecureDownloadPage').then(m => ({ default: m.SecureDownloadPage })))
 const LoginPage = lazy(() => import('./pages/auth/AuthPages').then(m => ({ default: m.LoginPage })))
 const SignupPage = lazy(() => import('./pages/auth/AuthPages').then(m => ({ default: m.SignupPage })))
@@ -49,6 +51,8 @@ function AppRoutes() {
         {/* Public marketing */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/security" element={<SecurityPage />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
 
         {/* Public secure download */}
         <Route path="/s/:token" element={<SecureDownloadPage />} />

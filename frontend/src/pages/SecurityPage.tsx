@@ -22,46 +22,46 @@ const SecurityPage: React.FC = () => (
   <div className="min-h-screen bg-black text-[#D1D0D0]">
     <LandingNav />
 
-    <main className="pt-32 pb-24 px-6">
+    <main className="pt-32 pb-32 px-6">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="mb-16">
-          <span className="text-[10px] tracking-[0.16em] uppercase text-[rgba(209,208,208,0.35)] mb-4 block">Security architecture</span>
-          <h1 className="font-semibold text-[#D1D0D0] mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.0', letterSpacing: '-0.035em' }}>
+        <div className="mb-20">
+          <span className="text-[10px] tracking-[0.16em] uppercase text-[rgba(209,208,208,0.35)] mb-5 block">Security architecture</span>
+          <h1 className="font-semibold text-[#D1D0D0] mb-6" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.05', letterSpacing: '-0.035em' }}>
             How VaultKey protects your files
           </h1>
-          <p className="text-base text-[rgba(209,208,208,0.5)] leading-relaxed max-w-xl">
+          <p className="text-base text-[rgba(209,208,208,0.5)] leading-[1.75] max-w-xl">
             An honest account of the security architecture. Every claim made in this product corresponds to a real implementation.
           </p>
         </div>
 
         {/* Architecture flow */}
-        <section className="mb-20">
-          <h2 className="text-sm font-medium text-[#D1D0D0] mb-8 tracking-wide">Encryption architecture</h2>
+        <section className="mb-24">
+          <h2 className="text-sm font-medium text-[#D1D0D0] mb-10 tracking-wide uppercase text-[10px] tracking-[0.12em] text-[rgba(209,208,208,0.5)]">Encryption architecture</h2>
           <div className="space-y-0">
             {archSteps.map((step, i) => (
               <div key={i} className="relative flex gap-6">
                 {/* Left: step number + connector */}
                 <div className="flex flex-col items-center">
-                  <div className="w-7 h-7 rounded-sm border border-[rgba(209,208,208,0.15)] bg-[#0e0e0e] flex items-center justify-center text-[10px] font-mono text-[rgba(209,208,208,0.4)] shrink-0">
+                  <div className="w-8 h-8 rounded-sm border border-[rgba(209,208,208,0.15)] bg-[#0e0e0e] flex items-center justify-center text-[10px] font-mono text-[rgba(209,208,208,0.4)] shrink-0">
                     {String(i + 1).padStart(2, '0')}
                   </div>
                   {i < archSteps.length - 1 && (
-                    <div className="w-px flex-1 mt-2 mb-0 bg-[rgba(209,208,208,0.07)]" style={{ minHeight: 32 }} />
+                    <div className="w-px flex-1 mt-3 mb-0 bg-[rgba(209,208,208,0.07)]" style={{ minHeight: 40 }} />
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 pb-8">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-xs font-medium text-[#D1D0D0]">{step.label}</span>
+                <div className="flex-1 pb-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-medium text-[#D1D0D0]">{step.label}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] text-[rgba(209,208,208,0.4)] mb-2 font-mono">
+                  <div className="flex items-center gap-2 text-[11px] text-[rgba(209,208,208,0.4)] mb-3 font-mono">
                     <span>{step.from}</span>
                     <span>→</span>
                     <span className="text-[rgba(209,208,208,0.6)]">{step.to}</span>
                   </div>
-                  <p className="text-sm text-[rgba(209,208,208,0.5)] leading-relaxed">{step.detail}</p>
+                  <p className="text-sm text-[rgba(209,208,208,0.5)] leading-[1.75]">{step.detail}</p>
                 </div>
               </div>
             ))}
@@ -69,9 +69,9 @@ const SecurityPage: React.FC = () => (
         </section>
 
         {/* Security features */}
-        <section className="mb-20">
-          <h2 className="text-sm font-medium text-[#D1D0D0] mb-6 tracking-wide">Security controls</h2>
-          <div className="space-y-3">
+        <section className="mb-24">
+          <h2 className="text-[10px] font-medium text-[rgba(209,208,208,0.5)] mb-8 tracking-[0.12em] uppercase">Security controls</h2>
+          <div className="space-y-4">
             {[
               {
                 icon: <Lock size={15} />,
@@ -110,16 +110,16 @@ const SecurityPage: React.FC = () => (
                 status: 'Live',
               },
             ].map((f, i) => (
-              <div key={i} className="flex gap-4 p-5 rounded-md border border-[rgba(209,208,208,0.08)] bg-[#090909]">
+              <div key={i} className="flex gap-5 p-6 rounded-md border border-[rgba(209,208,208,0.08)] bg-[#090909]">
                 <div className="text-[rgba(209,208,208,0.4)] mt-0.5 shrink-0">{f.icon}</div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1.5">
+                  <div className="flex items-center gap-3 mb-2.5">
                     <span className="text-sm font-medium text-[#D1D0D0]">{f.title}</span>
                     <span className="text-[9px] tracking-wider text-[rgba(109,191,140,0.7)] bg-[rgba(109,191,140,0.08)] border border-[rgba(109,191,140,0.15)] px-1.5 py-0.5 rounded-sm font-medium">
                       {f.status}
                     </span>
                   </div>
-                  <p className="text-xs text-[rgba(209,208,208,0.45)] leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-[rgba(209,208,208,0.45)] leading-[1.75]">{f.desc}</p>
                 </div>
               </div>
             ))}
@@ -127,9 +127,9 @@ const SecurityPage: React.FC = () => (
         </section>
 
         {/* Honest limitations */}
-        <section className="mb-20">
-          <h2 className="text-sm font-medium text-[#D1D0D0] mb-4 tracking-wide">Honest limitations</h2>
-          <div className="p-5 rounded-md border border-[rgba(209,208,208,0.08)] bg-[#090909] space-y-3">
+        <section className="mb-24">
+          <h2 className="text-[10px] font-medium text-[rgba(209,208,208,0.5)] mb-6 tracking-[0.12em] uppercase">Honest limitations</h2>
+          <div className="p-6 rounded-md border border-[rgba(209,208,208,0.08)] bg-[#090909] space-y-4">
             {[
               'If you share the URL (including its fragment) publicly, anyone with it can decrypt the file.',
               'VaultKey does not encrypt file metadata such as filename, size, or MIME type in the current version.',
@@ -137,8 +137,8 @@ const SecurityPage: React.FC = () => (
               'If a recipient copies the decryption key from the URL fragment, they can decrypt the file even after revocation (from locally cached data).',
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="text-[10px] font-mono text-[rgba(209,208,208,0.25)] mt-0.5 shrink-0">—</span>
-                <p className="text-sm text-[rgba(209,208,208,0.5)]">{item}</p>
+                <span className="text-[10px] font-mono text-[rgba(209,208,208,0.25)] mt-1 shrink-0">—</span>
+                <p className="text-sm text-[rgba(209,208,208,0.5)] leading-[1.75]">{item}</p>
               </div>
             ))}
           </div>
