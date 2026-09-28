@@ -3,11 +3,13 @@ import { Link, useLocation } from 'react-router-dom'
 import { Shield, Menu, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Button } from '../ui/Button'
+import { useAuth } from '../../contexts/AuthContext'
 
 export const LandingNav: React.FC = () => {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const location = useLocation()
+  const { user, loading } = useAuth()
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40)
@@ -59,12 +61,22 @@ export const LandingNav: React.FC = () => {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link to="/auth/login">
-            <Button variant="ghost" size="sm">Log in</Button>
-          </Link>
-          <Link to="/auth/signup">
-            <Button variant="primary" size="sm">Get started</Button>
-          </Link>
+          {!loading && (
+            user ? (
+              <Link to="/dashboard">
+                <Button variant="primary" size="sm">Go to dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth/login">
+                  <Button variant="ghost" size="sm">Log in</Button>
+                </Link>
+                <Link to="/auth/signup">
+                  <Button variant="primary" size="sm">Get started</Button>
+                </Link>
+              </>
+            )
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -92,12 +104,22 @@ export const LandingNav: React.FC = () => {
               </a>
             ))}
             <div className="pt-2 flex flex-col gap-2">
-              <Link to="/auth/login">
-                <Button variant="secondary" size="md" className="w-full">Log in</Button>
-              </Link>
-              <Link to="/auth/signup">
-                <Button variant="primary" size="md" className="w-full">Get started</Button>
-              </Link>
+              {!loading && (
+                user ? (
+                  <Link to="/dashboard">
+                    <Button variant="primary" size="md" className="w-full">Go to dashboard</Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/auth/login">
+                      <Button variant="secondary" size="md" className="w-full">Log in</Button>
+                    </Link>
+                    <Link to="/auth/signup">
+                      <Button variant="primary" size="md" className="w-full">Get started</Button>
+                    </Link>
+                  </>
+                )
+              )}
             </div>
           </nav>
         </div>
