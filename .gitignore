@@ -64,3 +64,8 @@ Thumbs.db
 overview.md 
 
 backend/app/__pycache__/*
+
+# Firebase Admin credentials
+firebase-service-account*.json
+*-firebase-adminsdk-*.json
+service-account*.json

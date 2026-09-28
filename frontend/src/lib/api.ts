@@ -155,6 +155,13 @@ export async function apiGetMe(): Promise<ApiUser> {
   return apiFetch<ApiUser>('/api/auth/me')
 }
 
+export async function apiGoogleAuth(idToken: string): Promise<ApiTokenResponse> {
+  return apiFetch<ApiTokenResponse>('/api/auth/google', {
+    method: 'POST',
+    body: JSON.stringify({ id_token: idToken }),
+  }, false)
+}
+
 
 // ── Files ──────────────────────────────────────────────────────────────────────
 

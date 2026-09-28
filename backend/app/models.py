@@ -25,7 +25,8 @@ class User(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     email = Column(String(255), unique=True, nullable=False, index=True)
-    hashed_password = Column(String(255), nullable=False)
+    hashed_password = Column(String(255), nullable=True)   # NULL for Google-only users
+    firebase_uid = Column(String(128), unique=True, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     files = relationship("FileItem", back_populates="owner", cascade="all, delete-orphan")
