@@ -9,16 +9,38 @@
  *   • download flow: AES-256-GCM decrypt in browser → temporary anchor click → revoke URL.
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import {
-  Shield, FileText, Lock, Clock, Hash,
-  Download, CheckCircle2, AlertCircle, Eye, EyeOff,
+  Shield, Lock, Clock, Hash,
+  Download, CheckCircle2, AlertCircle, Eye, EyeOff, ArrowRight,
 } from 'lucide-react'
-import { getShareByToken, authorizePassword, downloadAndDecrypt, viewAndDecrypt } from '../lib/shares'
+import { getShareByToken, downloadAndDecrypt, viewAndDecrypt } from '../lib/shares'
 import { apiRecordAccessAttempt, apiReportBlockedAction } from '../lib/api'
 import { extractKeyFromFragment } from '../lib/utils'
 import { ViewOnlyViewer } from '../components/shares/ViewOnlyViewer'
+import { useAuth } from '../contexts/AuthContext'
 import type { ApiAccessCheck } from '../lib/api'
+
+// ─── Public nav links for recipients ─────────────────────────────────────────
+
+const PublicNav: React.FC = () => (
+  <nav className="flex items-center justify-center gap-5 mb-8" aria-label="Explore VaultKey">
+    {[
+      { label: 'Home', to: '/' },
+      { label: 'Security', to: '/security' },
+      { label: 'How it works', to: '/how-it-works' },
+      { label: 'Pricing', to: '/pricing' },
+    ].map(link => (
+      <Link
+        key={link.to}
+        to={link.to}
+        className="text-[10px] tracking-[0.1em] uppercase text-[rgba(209,208,208,0.3)] hover:text-[rgba(209,208,208,0.7)] transition-colors"
+      >
+        {link.label}
+      </Link>
+    ))}
+  </nav>
+)
 
 // ─── Shell layout ─────────────────────────────────────────────────────────────
 
@@ -28,10 +50,13 @@ const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       style={{ backgroundImage: 'radial-gradient(circle, rgba(209,208,208,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }}
     />
     <div className="relative z-10 w-full max-w-md">
-      <div className="flex items-center justify-center gap-2 mb-10">
+      {/* Branding */}
+      <Link to="/" className="flex items-center justify-center gap-2 mb-4">
         <Shield size={16} className="text-[rgba(209,208,208,0.5)]" />
         <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[rgba(209,208,208,0.4)]">VaultKey</span>
-      </div>
+      </Link>
+      {/* Public nav for recipients */}
+      <PublicNav />
       {children}
     </div>
   </div>
@@ -41,6 +66,7 @@ const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 export function SecureDownloadPage() {
   const { token } = useParams<{ token: string }>()
+  const { user } = useAuth()
 
   const [accessData, setAccessData] = useState<ApiAccessCheck | null>(null)
   const [loading, setLoading] = useState(true)
@@ -313,6 +339,21 @@ export function SecureDownloadPage() {
         <p className="text-[11px] text-center text-[rgba(209,208,208,0.3)] mt-6">
           VaultKey client-side decryption occurs in your browser.
         </p>
+
+        {/* Share your own document CTA */}
+        <div className="mt-8 border border-[rgba(209,208,208,0.07)] rounded-lg p-5 bg-[#080808] text-center">
+          <p className="text-xs text-[rgba(209,208,208,0.5)] mb-3">
+            Want to share your own files this securely?
+          </p>
+          <Link
+            to={user ? '/dashboard' : '/auth/signup'}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[rgba(209,208,208,0.08)] border border-[rgba(209,208,208,0.1)] text-xs text-[rgba(209,208,208,0.7)] hover:bg-[rgba(209,208,208,0.12)] hover:text-[#D1D0D0] transition-all"
+          >
+            <Shield size={12} />
+            Share your own document securely
+            <ArrowRight size={11} />
+          </Link>
+        </div>
       </Shell>
     </>
   )

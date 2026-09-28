@@ -21,9 +21,9 @@ export const LandingNav: React.FC = () => {
   useEffect(() => setOpen(false), [location])
 
   const navLinks = [
-    { label: 'Security', href: '/security' },
-    { label: 'How it works', href: '/#how-it-works' },
-    { label: 'Pricing', href: '/#pricing' },
+    { label: 'Security', to: '/security' },
+    { label: 'How it works', to: '/how-it-works' },
+    { label: 'Pricing', to: '/pricing' },
   ]
 
   return (
@@ -49,13 +49,13 @@ export const LandingNav: React.FC = () => {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
           {navLinks.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
+            <Link
+              key={link.to}
+              to={link.to}
               className="text-xs tracking-wide text-[rgba(209,208,208,0.55)] hover:text-[#D1D0D0] transition-colors duration-200 uppercase"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -94,14 +94,14 @@ export const LandingNav: React.FC = () => {
         <div className="md:hidden bg-[#090909] border-b border-[rgba(209,208,208,0.08)] px-6 pb-6">
           <nav className="flex flex-col gap-4 pt-4">
             {navLinks.map(link => (
-              <a
-                key={link.href}
-                href={link.href}
+              <Link
+                key={link.to}
+                to={link.to}
                 className="text-sm text-[rgba(209,208,208,0.7)] hover:text-[#D1D0D0] transition-colors"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="pt-2 flex flex-col gap-2">
               {!loading && (

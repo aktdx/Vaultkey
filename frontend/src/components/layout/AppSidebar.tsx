@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Shield, LayoutDashboard, Files, Share2, Activity, Settings, LogOut, ChevronLeft, Lock, Menu, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
@@ -27,15 +27,26 @@ export const AppSidebar: React.FC = () => {
 
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? 'VK'
 
+  const [emailTooltip, setEmailTooltip] = useState(false)
+  const emailRef = useRef<HTMLDivElement>(null)
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className={cn('flex items-center gap-3 px-5 py-5 border-b border-[rgba(209,208,208,0.07)]', collapsed && 'justify-center px-3')}>
+      {/* Logo — navigates to dashboard */}
+      <Link
+        to="/dashboard"
+        aria-label="Go to dashboard"
+        className={cn(
+          'flex items-center gap-3 px-5 py-5 border-b border-[rgba(209,208,208,0.07)] cursor-pointer hover:bg-[rgba(209,208,208,0.03)] transition-colors',
+          collapsed && 'justify-center px-3'
+        )}
+        onClick={() => setMobileOpen(false)}
+      >
         <Shield size={18} className="text-[#D1D0D0] shrink-0" />
         {!collapsed && (
           <span className="text-xs font-semibold tracking-[0.14em] uppercase text-[#D1D0D0]">VaultKey</span>
         )}
-      </div>
+      </Link>
 
       {/* Nav */}
       <nav className="flex-1 py-4 px-2" aria-label="Dashboard navigation">
@@ -65,8 +76,18 @@ export const AppSidebar: React.FC = () => {
 
       {/* Footer */}
       <div className="border-t border-[rgba(209,208,208,0.07)] p-2">
-        {/* User */}
-        <div className={cn('flex items-center gap-3 px-3 py-2.5 mb-1 rounded', collapsed && 'justify-center px-2')}>
+        {/* User — hover tooltip shows full email */}
+        <div
+          ref={emailRef}
+          className={cn('relative flex items-center gap-3 px-3 py-2.5 mb-1 rounded', collapsed && 'justify-center px-2')}
+          onMouseEnter={() => setEmailTooltip(true)}
+          onMouseLeave={() => setEmailTooltip(false)}
+          onFocus={() => setEmailTooltip(true)}
+          onBlur={() => setEmailTooltip(false)}
+          tabIndex={0}
+          aria-label={`Signed in as ${user?.email}`}
+          role="status"
+        >
           <div className="w-6 h-6 rounded-sm bg-[#2a2020] flex items-center justify-center text-[10px] font-medium text-[#988686] shrink-0">
             {initials}
           </div>
@@ -74,6 +95,16 @@ export const AppSidebar: React.FC = () => {
             <span className="text-xs text-[rgba(209,208,208,0.5)] truncate max-w-[120px]">
               {user?.email}
             </span>
+          )}
+          {/* Tooltip */}
+          {emailTooltip && user?.email && (
+            <div
+              className="absolute bottom-full left-2 mb-2 z-50 px-3 py-2 rounded bg-[#1a1a1a] border border-[rgba(209,208,208,0.15)] text-xs text-[#D1D0D0] whitespace-nowrap shadow-lg pointer-events-none"
+              role="tooltip"
+            >
+              {user.email}
+              <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#1a1a1a]" />
+            </div>
           )}
         </div>
 
@@ -117,10 +148,10 @@ export const AppSidebar: React.FC = () => {
 
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-[#080808] border-b border-[rgba(209,208,208,0.07)] h-14 flex items-center justify-between px-4">
-        <div className="flex items-center gap-2">
+        <Link to="/dashboard" className="flex items-center gap-2" aria-label="Go to dashboard">
           <Shield size={16} className="text-[#D1D0D0]" />
           <span className="text-xs font-semibold tracking-[0.14em] uppercase text-[#D1D0D0]">VaultKey</span>
-        </div>
+        </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="p-2 text-[rgba(209,208,208,0.6)]"

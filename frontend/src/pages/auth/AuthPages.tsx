@@ -24,10 +24,10 @@ const AuthLayout: React.FC<{ children: React.ReactNode; title: string; subtitle?
       </Link>
 
       {/* Card */}
-      <div className="rounded-lg border border-[rgba(209,208,208,0.1)] bg-[#0a0a0a] p-8">
-        <div className="mb-7">
+      <div className="rounded-lg border border-[rgba(209,208,208,0.1)] bg-[#0a0a0a] px-8 pt-8 pb-6">
+        <div className="mb-6">
           <h1 className="text-xl font-medium text-[#D1D0D0] tracking-tight">{title}</h1>
-          {subtitle && <p className="mt-1.5 text-sm text-[rgba(209,208,208,0.45)]">{subtitle}</p>}
+          {subtitle && <p className="mt-2 text-sm text-[rgba(209,208,208,0.45)] leading-relaxed">{subtitle}</p>}
         </div>
         {children}
       </div>
@@ -116,7 +116,7 @@ export const LoginPage: React.FC = () => {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-[rgba(209,208,208,0.35)]">
+      <p className="mt-8 text-center text-xs text-[rgba(209,208,208,0.35)]">
         Don't have an account?{' '}
         <Link to="/auth/signup" className="text-[rgba(209,208,208,0.7)] hover:text-[#D1D0D0] transition-colors">
           Sign up
@@ -183,7 +183,7 @@ export const SignupPage: React.FC = () => {
   }
 
   return (
-    <AuthLayout title="Create your account" subtitle="Secure file sharing starts here">
+    <AuthLayout title="Your files deserve serious protection" subtitle="Create your account to start secure file sharing">
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <Input
           label="Email"
@@ -247,7 +247,7 @@ export const SignupPage: React.FC = () => {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-[rgba(209,208,208,0.35)]">
+      <p className="mt-8 text-center text-xs text-[rgba(209,208,208,0.35)]">
         Already have an account?{' '}
         <Link to="/auth/login" className="text-[rgba(209,208,208,0.7)] hover:text-[#D1D0D0] transition-colors">
           Sign in

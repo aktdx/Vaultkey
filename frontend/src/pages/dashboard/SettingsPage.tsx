@@ -40,93 +40,102 @@ export const SettingsPage: React.FC = () => {
           <p className="mt-0.5 text-sm text-[rgba(209,208,208,0.4)]">Account and security preferences</p>
         </div>
 
-        <div className="px-6 md:px-8 py-8 max-w-2xl space-y-10">
-          {/* Account */}
-          <section>
-            <SectionHeading icon={<User size={15} />} title="Account" subtitle="Your account information" />
-            <div className="space-y-4">
-              <Input label="Email" type="email" value={user?.email || ''} readOnly className="opacity-70" />
-              <div className="flex justify-end">
-                <Button variant="secondary" size="sm" onClick={() => toast('info', 'Email change', 'A confirmation will be sent to your new address.')}>
-                  Update email
-                </Button>
-              </div>
-            </div>
-          </section>
+        <div className="px-6 md:px-8 py-8 max-w-5xl">
+          {/* Two-column grid on large screens */}
+          <div className="grid xl:grid-cols-2 gap-8">
+            {/* LEFT COLUMN: Account & Password */}
+            <div className="space-y-8">
+              {/* Account */}
+              <section className="border border-[rgba(209,208,208,0.07)] rounded-lg p-6 bg-[#080808]">
+                <SectionHeading icon={<User size={15} />} title="Account" subtitle="Your account information" />
+                <div className="space-y-4">
+                  <Input label="Email" type="email" value={user?.email || ''} readOnly className="opacity-70" />
+                  <div className="flex justify-end">
+                    <Button variant="secondary" size="sm" onClick={() => toast('info', 'Email change', 'A confirmation will be sent to your new address.')}>
+                      Update email
+                    </Button>
+                  </div>
+                </div>
+              </section>
 
-          {/* Password */}
-          <section>
-            <SectionHeading icon={<Key size={15} />} title="Password" subtitle="Change your account password" />
-            <div className="space-y-4">
-              <Input label="Current password" type="password" placeholder="••••••••" />
-              <Input label="New password" type="password" placeholder="••••••••" />
-              <Input label="Confirm new password" type="password" placeholder="••••••••" />
-              <div className="flex justify-end">
-                <Button variant="secondary" size="sm" onClick={() => toast('success', 'Password updated')}>
-                  Update password
-                </Button>
-              </div>
+              {/* Password */}
+              <section className="border border-[rgba(209,208,208,0.07)] rounded-lg p-6 bg-[#080808]">
+                <SectionHeading icon={<Key size={15} />} title="Password" subtitle="Change your account password" />
+                <div className="space-y-4">
+                  <Input label="Current password" type="password" placeholder="••••••••" />
+                  <Input label="New password" type="password" placeholder="••••••••" />
+                  <Input label="Confirm new password" type="password" placeholder="••••••••" />
+                  <div className="flex justify-end">
+                    <Button variant="secondary" size="sm" onClick={() => toast('success', 'Password updated')}>
+                      Update password
+                    </Button>
+                  </div>
+                </div>
+              </section>
             </div>
-          </section>
 
-          {/* Share defaults */}
-          <section>
-            <SectionHeading icon={<Shield size={15} />} title="Share defaults" subtitle="Default settings for new secure links" />
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Default expiry (days)"
-                  type="number"
-                  value={defaultExpiry}
-                  onChange={e => setDefaultExpiry(e.target.value)}
-                  hint="Leave blank for no expiry"
-                  min="1"
-                />
-                <Input
-                  label="Default download limit"
-                  type="number"
-                  value={defaultMaxDl}
-                  onChange={e => setDefaultMaxDl(e.target.value)}
-                  hint="Leave blank for unlimited"
-                  min="1"
-                />
-              </div>
-              <div className="flex justify-end">
-                <Button variant="secondary" size="sm" onClick={save}>Save defaults</Button>
-              </div>
+            {/* RIGHT COLUMN: Share defaults & Notifications */}
+            <div className="space-y-8">
+              {/* Share defaults */}
+              <section className="border border-[rgba(209,208,208,0.07)] rounded-lg p-6 bg-[#080808]">
+                <SectionHeading icon={<Shield size={15} />} title="Share defaults" subtitle="Default settings for new secure links" />
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="Default expiry (days)"
+                      type="number"
+                      value={defaultExpiry}
+                      onChange={e => setDefaultExpiry(e.target.value)}
+                      hint="Leave blank for no expiry"
+                      min="1"
+                    />
+                    <Input
+                      label="Default download limit"
+                      type="number"
+                      value={defaultMaxDl}
+                      onChange={e => setDefaultMaxDl(e.target.value)}
+                      hint="Leave blank for unlimited"
+                      min="1"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button variant="secondary" size="sm" onClick={save}>Save defaults</Button>
+                  </div>
+                </div>
+              </section>
+
+              {/* Notifications */}
+              <section className="border border-[rgba(209,208,208,0.07)] rounded-lg p-6 bg-[#080808]">
+                <SectionHeading icon={<Bell size={15} />} title="Notifications" subtitle="Security alerts and activity emails" />
+                <div className="space-y-4">
+                  <Toggle
+                    checked={emailNotifs}
+                    onChange={setEmailNotifs}
+                    label="Activity summary emails"
+                    description="Receive a daily summary of file access events"
+                  />
+                  <Toggle
+                    checked={downloadAlerts}
+                    onChange={setDownloadAlerts}
+                    label="Download alerts"
+                    description="Get notified when a file is downloaded via a secure link"
+                  />
+                  <Toggle
+                    checked={failedAuthAlerts}
+                    onChange={setFailedAuthAlerts}
+                    label="Failed authentication alerts"
+                    description="Get notified when someone enters an incorrect password"
+                  />
+                  <div className="flex justify-end pt-2">
+                    <Button variant="secondary" size="sm" onClick={save}>Save notifications</Button>
+                  </div>
+                </div>
+              </section>
             </div>
-          </section>
+          </div>
 
-          {/* Notifications */}
-          <section>
-            <SectionHeading icon={<Bell size={15} />} title="Notifications" subtitle="Security alerts and activity emails" />
-            <div className="space-y-4">
-              <Toggle
-                checked={emailNotifs}
-                onChange={setEmailNotifs}
-                label="Activity summary emails"
-                description="Receive a daily summary of file access events"
-              />
-              <Toggle
-                checked={downloadAlerts}
-                onChange={setDownloadAlerts}
-                label="Download alerts"
-                description="Get notified when a file is downloaded via a secure link"
-              />
-              <Toggle
-                checked={failedAuthAlerts}
-                onChange={setFailedAuthAlerts}
-                label="Failed authentication alerts"
-                description="Get notified when someone enters an incorrect password"
-              />
-              <div className="flex justify-end pt-2">
-                <Button variant="secondary" size="sm" onClick={save}>Save notifications</Button>
-              </div>
-            </div>
-          </section>
-
-          {/* Danger zone */}
-          <section>
+          {/* Danger zone — full width below grid */}
+          <section className="mt-8">
             <div className="border border-[rgba(232,123,123,0.15)] rounded-md p-5">
               <h2 className="text-sm font-medium text-[#e87b7b] mb-1">Danger zone</h2>
               <p className="text-xs text-[rgba(209,208,208,0.4)] mb-4">
