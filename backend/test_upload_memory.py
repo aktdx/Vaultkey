@@ -31,7 +31,7 @@ def _make_client() -> TestClient:
 
 def _register_and_login(client: TestClient) -> str:
     """Register (or reuse) a test user and return a Bearer token."""
-    email = "upload_test@vaultkey.test"
+    email = "upload_test@vaultkey.app"
     password = "UploadTest999!"
     resp = client.post("/api/auth/register", json={"email": email, "password": password})
     if resp.status_code == 400:  # already registered

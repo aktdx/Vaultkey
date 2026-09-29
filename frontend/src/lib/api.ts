@@ -93,6 +93,11 @@ export interface ApiShareCreateResponse {
   access_mode: 'download' | 'view_only'
   has_password: boolean
   created_at: string
+  wrapped_fek?: string | null
+  kdf_salt?: string | null
+  kdf_iterations?: number | null
+  kdf_algorithm?: string | null
+  wrapping_iv?: string | null
 }
 
 export interface ApiShareDetail {
@@ -108,10 +113,16 @@ export interface ApiShareDetail {
   revoked_at: string | null
   created_at: string
   status: 'ACTIVE' | 'EXPIRED' | 'REVOKED' | 'LIMIT_REACHED' | 'VIEW_ONLY'
+  wrapped_fek?: string | null
+  kdf_salt?: string | null
+  kdf_iterations?: number | null
+  kdf_algorithm?: string | null
+  wrapping_iv?: string | null
 }
 
 export interface ApiAccessCheck {
   valid: boolean
+  share_id: string | null
   original_filename: string
   file_size: number
   expires_at: string | null
@@ -121,6 +132,16 @@ export interface ApiAccessCheck {
   requires_password: boolean
   revoked: boolean
   status: 'OK' | 'EXPIRED' | 'REVOKED' | 'LIMIT_REACHED' | 'INVALID'
+  wrapped_fek?: string | null
+  kdf_salt?: string | null
+  kdf_iterations?: number | null
+  kdf_algorithm?: string | null
+  wrapping_iv?: string | null
+}
+
+export interface ApiSessionStatus {
+  valid: boolean
+  status: 'OK' | 'EXPIRED' | 'REVOKED' | 'INVALID'
 }
 
 export interface ApiActivityLog {
@@ -233,6 +254,12 @@ export interface CreateSharePayload {
   max_downloads?: number
   access_mode?: 'download' | 'view_only'
   password?: string | null
+  password_hash?: string | null
+  wrapped_fek?: string | null
+  kdf_salt?: string | null
+  kdf_iterations?: number | null
+  kdf_algorithm?: string | null
+  wrapping_iv?: string | null
 }
 
 export async function apiCreateShare(payload: CreateSharePayload): Promise<ApiShareCreateResponse> {
@@ -262,17 +289,22 @@ export async function apiCheckAccess(token: string): Promise<ApiAccessCheck> {
   return apiFetch<ApiAccessCheck>(`/api/access/${token}`, {}, false)
 }
 
+export async function apiCheckSessionStatus(shareId: string): Promise<ApiSessionStatus> {
+  return apiFetch<ApiSessionStatus>(`/api/access/${shareId}/session-status`, {}, false)
+}
+
 export async function apiRecordAccessAttempt(token: string): Promise<void> {
   await apiFetch<void>(`/api/access/${token}/attempt`, { method: 'POST' }, false)
 }
 
 export async function apiAuthorizePassword(
   token: string,
-  password: string
+  password?: string,
+  passwordHash?: string
 ): Promise<void> {
   await apiFetch<void>(`/api/access/${token}/authorize`, {
     method: 'POST',
-    body: JSON.stringify({ password }),
+    body: JSON.stringify({ password: password ?? null, password_hash: passwordHash ?? null }),
   }, false)
 }
 
@@ -282,7 +314,8 @@ export async function apiAuthorizePassword(
  */
 export async function apiDownloadFile(
   token: string,
-  password?: string
+  password?: string,
+  passwordHash?: string
 ): Promise<{ blob: Blob; ivHex: string; originalFilename: string; mimeType: string }> {
   const token_jwt = getToken()
   const headers: Record<string, string> = {
@@ -293,7 +326,7 @@ export async function apiDownloadFile(
   const res = await fetch(`${BASE_URL}/api/access/${token}/download`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ password: password ?? null }),
+    body: JSON.stringify({ password: password ?? null, password_hash: passwordHash ?? null }),
   })
 
   if (!res.ok) {
@@ -315,12 +348,13 @@ export async function apiDownloadFile(
  */
 export async function apiViewFile(
   token: string,
-  password?: string
+  password?: string,
+  passwordHash?: string
 ): Promise<{ blob: Blob; ivHex: string; originalFilename: string; mimeType: string }> {
   const res = await fetch(`${BASE_URL}/api/access/${token}/view`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: password ?? null }),
+    body: JSON.stringify({ password: password ?? null, password_hash: passwordHash ?? null }),
   })
 
   if (!res.ok) {

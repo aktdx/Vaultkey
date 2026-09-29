@@ -38,9 +38,11 @@ def create_share_link(
     raw_token = generate_secure_token()
     token_hash = hash_share_token(raw_token)
 
-    # Hash optional password
+    # Hash optional password (or accept client-derived password_hash to avoid transmitting plaintext password)
     password_hash = None
-    if payload.password and payload.password.strip():
+    if payload.password_hash and payload.password_hash.strip():
+        password_hash = payload.password_hash.strip()
+    elif payload.password and payload.password.strip():
         password_hash = hash_password(payload.password.strip())
 
     # Resolve access_mode: explicit field takes precedence.
@@ -59,7 +61,12 @@ def create_share_link(
         max_downloads=payload.max_downloads,
         download_count=0,
         password_hash=password_hash,
-        revoked=False
+        revoked=False,
+        wrapped_fek=payload.wrapped_fek,
+        kdf_salt=payload.kdf_salt,
+        kdf_iterations=payload.kdf_iterations or 600000,
+        kdf_algorithm=payload.kdf_algorithm or "PBKDF2-HMAC-SHA-256",
+        wrapping_iv=payload.wrapping_iv,
     )
 
     db.add(share)
@@ -78,7 +85,12 @@ def create_share_link(
         max_downloads=payload.max_downloads,
         access_mode=resolved_access_mode,
         has_password=password_hash is not None,
-        created_at=share.created_at
+        created_at=share.created_at,
+        wrapped_fek=share.wrapped_fek,
+        kdf_salt=share.kdf_salt,
+        kdf_iterations=share.kdf_iterations,
+        kdf_algorithm=share.kdf_algorithm,
+        wrapping_iv=share.wrapping_iv,
     )
 
 @router.get("", response_model=List[ShareDetailResponse])
@@ -127,7 +139,12 @@ def list_user_shares(
             revoked=s.revoked,
             revoked_at=s.revoked_at,
             created_at=s.created_at,
-            status=status_str
+            status=status_str,
+            wrapped_fek=s.wrapped_fek,
+            kdf_salt=s.kdf_salt,
+            kdf_iterations=s.kdf_iterations,
+            kdf_algorithm=s.kdf_algorithm,
+            wrapping_iv=s.wrapping_iv,
         ))
 
     return result
@@ -172,7 +189,12 @@ def get_share_detail(
         revoked=s.revoked,
         revoked_at=s.revoked_at,
         created_at=s.created_at,
-        status=status_str
+        status=status_str,
+        wrapped_fek=s.wrapped_fek,
+        kdf_salt=s.kdf_salt,
+        kdf_iterations=s.kdf_iterations,
+        kdf_algorithm=s.kdf_algorithm,
+        wrapping_iv=s.wrapping_iv,
     )
 
 @router.post("/{share_id}/revoke")

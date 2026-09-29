@@ -1,5 +1,6 @@
 import os
 import tempfile
+import logging
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
 from sqlalchemy.orm import Session
@@ -12,19 +13,22 @@ from ..security import get_current_user
 from ..storage import generate_object_key, upload_file_streaming, delete_file
 
 router = APIRouter(prefix="/api/files", tags=["Files"])
+logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB
 CHUNK_SIZE = 1 * 1024 * 1024            # 1 MB read chunks
 
 # Allowed file extensions matching encrypt.js validation
 ALLOWED_EXTENSIONS = {
-    ".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp",
+    ".pdf", ".ppt", ".pptx", ".png", ".jpg", ".jpeg", ".gif", ".webp",
     ".txt", ".md", ".json", ".js", ".py", ".html", ".css", ".csv", ".log",
 }
 
 # Extension to MIME type mapping
 EXTENSION_TO_MIME = {
     ".pdf":  "application/pdf",
+    ".ppt":  "application/vnd.ms-powerpoint",
+    ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ".png":  "image/png",
     ".jpg":  "image/jpeg",
     ".jpeg": "image/jpeg",
@@ -97,8 +101,10 @@ async def upload_encrypted_file(
     # Both storage calls run in a threadpool worker so the event loop is not
     # blocked by boto3's synchronous network I/O.
     object_key = generate_object_key()
+    object_uploaded = False
     try:
         await run_in_threadpool(upload_file_streaming, object_key, spooled, mime_type)
+        object_uploaded = True
 
         file_record = FileItem(
             owner_id=current_user.id,
@@ -111,9 +117,27 @@ async def upload_encrypted_file(
         db.add(file_record)
         db.commit()
         db.refresh(file_record)
-    except Exception:
-        await run_in_threadpool(delete_file, object_key)
+    except HTTPException:
+        if object_uploaded:
+            try:
+                await run_in_threadpool(delete_file, object_key)
+            except Exception:
+                logger.warning("Failed to clean up encrypted storage object after upload failure.")
         raise
+    except Exception as exc:
+        if object_uploaded:
+            try:
+                await run_in_threadpool(delete_file, object_key)
+            except Exception:
+                logger.warning("Failed to clean up encrypted storage object after metadata failure.")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Encrypted file metadata could not be saved.",
+            ) from exc
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Encrypted file storage is unavailable. The upload was not saved.",
+        ) from exc
     finally:
         spooled.close()
 

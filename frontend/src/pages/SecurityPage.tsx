@@ -13,9 +13,9 @@ interface ArchStep {
 const archSteps: ArchStep[] = [
   { from: 'Browser', to: 'Web Crypto API', label: 'File selected', detail: 'File read into ArrayBuffer in the browser — never leaves the tab until encrypted' },
   { from: 'Web Crypto API', to: 'Encrypted Blob', label: 'AES-256-GCM encryption', detail: 'generateKey() → random 256-bit key + 96-bit IV → encrypt() → authenticated ciphertext' },
-  { from: 'Encrypted Blob', to: 'Cloudflare R2', label: 'Encrypted upload', detail: 'Only the ciphertext (with IV prepended) is transmitted. The key is never sent.' },
-  { from: 'VaultKey', to: 'Share URL', label: 'Zero-knowledge key delivery', detail: 'Key is appended to the URL fragment: /s/{token}#key={base64url_key}. Fragments are not sent in HTTP requests.' },
-  { from: 'Recipient Browser', to: 'Decrypted File', label: 'Client-side decryption', detail: 'Fragment key is parsed → AES-256-GCM decryption in browser → file downloaded locally' },
+  { from: 'Browser', to: 'Key Wrapping', label: 'Key wrapping & KDF', detail: 'A Key Encryption Key (KEK) is derived from a passphrase using PBKDF2-HMAC-SHA-256 (600,000 rounds). The FEK is wrapped using authenticated AES-256-GCM.' },
+  { from: 'VaultKey', to: 'Share URL', label: 'Clean zero-knowledge URL', detail: 'URLs contain only a random share ID (/s/{token}) with NO keys or IVs in the URL. Passphrases are shared out-of-band.' },
+  { from: 'Recipient Browser', to: 'Decrypted File', label: 'Client-side unwrapping & decryption', detail: 'Recipient browser derives KEK, unwraps FEK locally via authenticated AES-256-GCM, and decrypts the file.' },
 ]
 
 const SecurityPage: React.FC = () => (
@@ -81,8 +81,8 @@ const SecurityPage: React.FC = () => (
               },
               {
                 icon: <Shield size={15} />,
-                title: 'Zero-knowledge key delivery',
-                desc: 'Decryption keys are placed in the URL fragment (#key=...). URL fragments are never included in HTTP requests by browsers, meaning the key is never transmitted to VaultKey servers.',
+                title: 'Zero-knowledge key wrapping',
+                desc: 'File Encryption Keys (FEKs) are wrapped locally using a KEK derived with PBKDF2 (600,000 iterations). Share URLs contain strictly clean non-secret IDs (/s/<id>) with zero keys, IVs, or secrets in the URL.',
                 status: 'Live',
               },
               {

@@ -17,6 +17,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import { resolveMimeType, validateFileContent as validateEncryptedFileContent } from './crypto'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -200,5 +201,22 @@ describe('Security #1 — validateFileContent is wired into crypto.ts', () => {
     expect(validatePos).not.toBe(-1)
     expect(generateKeyPos).not.toBe(-1)
     expect(validatePos).toBeLessThan(generateKeyPos)
+  })
+})
+
+describe('PowerPoint upload validation', () => {
+  it('accepts legacy PowerPoint OLE files and rejects a bad signature', () => {
+    expect(() => validateEncryptedFileContent('slides.ppt', hexToBuffer('d0cf11e0a1b11ae1'))).not.toThrow()
+    expect(() => validateEncryptedFileContent('slides.ppt', hexToBuffer('504b0304'))).toThrow(/does not match/)
+  })
+
+  it('accepts PowerPoint Open XML files and rejects a bad ZIP signature', () => {
+    expect(() => validateEncryptedFileContent('slides.pptx', hexToBuffer('504b0304'))).not.toThrow()
+    expect(() => validateEncryptedFileContent('slides.pptx', hexToBuffer('d0cf11e0a1b11ae1'))).toThrow(/does not match/)
+  })
+
+  it('resolves the presentation MIME types', () => {
+    expect(resolveMimeType(null, 'slides.ppt')).toBe('application/vnd.ms-powerpoint')
+    expect(resolveMimeType(null, 'slides.pptx')).toBe('application/vnd.openxmlformats-officedocument.presentationml.presentation')
   })
 })

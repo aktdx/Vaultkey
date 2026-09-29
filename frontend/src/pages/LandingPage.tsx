@@ -243,8 +243,8 @@ const LandingPage: React.FC = () => {
               },
               {
                 icon: <Shield size={18} />,
-                title: 'Zero-knowledge delivery',
-                desc: 'Decryption keys travel in URL fragments (#key=...) — never transmitted to or stored by VaultKey servers.',
+                title: 'Zero-knowledge key wrapping',
+                desc: 'File Encryption Keys are wrapped locally with PBKDF2 (600,000 rounds). Share URLs never contain keys or secrets.',
                 tag: 'IMPLEMENTED',
               },
               {

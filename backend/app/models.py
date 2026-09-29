@@ -73,6 +73,13 @@ class ShareLink(Base):
     revoked_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
+    # Secure key wrapping fields (zero-knowledge key delivery)
+    wrapped_fek = Column(String(512), nullable=True)
+    kdf_salt = Column(String(128), nullable=True)
+    kdf_iterations = Column(Integer, nullable=True, default=600000)
+    kdf_algorithm = Column(String(50), nullable=True, default="PBKDF2-HMAC-SHA-256")
+    wrapping_iv = Column(String(64), nullable=True)
+
     file = relationship("FileItem", back_populates="shares")
     owner = relationship("User", back_populates="shares")
     access_logs = relationship("AccessLog", back_populates="share", cascade="all, delete-orphan")

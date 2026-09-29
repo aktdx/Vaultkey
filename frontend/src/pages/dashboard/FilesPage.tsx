@@ -27,7 +27,7 @@ export const FilesPage: React.FC = () => {
   const [uploadOpen, setUploadOpen] = useState(false)
   const [shareFileId, setShareFileId] = useState<string | null>(null)
   // Encryption key captured from upload — passed to CreateShareModal so the
-  // full #key= URL is built automatically (zero-knowledge delivery).
+  // key can be wrapped with the share passphrase.
   const [pendingKey, setPendingKey] = useState<string | undefined>(undefined)
   const toast = useToast()
 

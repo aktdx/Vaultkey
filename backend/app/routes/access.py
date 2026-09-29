@@ -1,6 +1,8 @@
 import os
+import secrets
 from datetime import datetime, timezone
 from typing import Optional
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
@@ -46,6 +48,13 @@ _EXT_MIME_FALLBACK: dict = {
 # ---------------------------------------------------------------------------
 
 def get_share_by_token(token: str, db: Session) -> Optional[ShareLink]:
+    try:
+        share_id = str(UUID(token))
+        share = db.query(ShareLink).filter(ShareLink.id == share_id).first()
+        if share:
+            return share
+    except ValueError:
+        pass
     token_hash = hash_share_token(token)
     return db.query(ShareLink).filter(ShareLink.token_hash == token_hash).first()
 
@@ -53,6 +62,31 @@ def get_share_by_token(token: str, db: Session) -> Optional[ShareLink]:
 def _share_access_mode(share: ShareLink) -> str:
     """Return normalised access_mode string, defaulting to 'download' for legacy rows."""
     return share.access_mode or AccessMode.DOWNLOAD.value
+
+
+def _verify_share_auth(share: ShareLink, payload: RecipientAuthorizeRequest) -> bool:
+    """Validate recipient password or password_hash against share.password_hash.
+
+    Supports both passlib-hashed passwords (pbkdf2_sha256 / bcrypt) and
+    zero-knowledge client-computed hashes.
+    """
+    if not share.password_hash:
+        return True
+
+    if payload.password_hash and payload.password_hash.strip():
+        if secrets.compare_digest(payload.password_hash.strip(), share.password_hash):
+            return True
+
+    if payload.password and payload.password.strip():
+        try:
+            if verify_password(payload.password.strip(), share.password_hash):
+                return True
+        except Exception:
+            pass
+        if secrets.compare_digest(payload.password.strip(), share.password_hash):
+            return True
+
+    return False
 
 
 def _is_view_only(share: ShareLink) -> bool:
@@ -100,6 +134,7 @@ def check_recipient_access(
     if not share:
         return RecipientCheckResponse(
             valid=False,
+            share_id=None,
             original_filename="",
             file_size=0,
             expires_at=None,
@@ -124,26 +159,38 @@ def check_recipient_access(
         else max(0, share.max_downloads - share.download_count)
     )
 
+    requires_pw = (share.password_hash is not None) or (share.wrapped_fek is not None)
+
     if share.revoked:
         log_event(db, share, "ACCESS_DENIED", "DENIED", request)
         db.commit()
         return RecipientCheckResponse(
-            valid=False, original_filename=filename, file_size=file_size,
+            valid=False, share_id=share.id, original_filename=filename, file_size=file_size,
             expires_at=share.expires_at, max_downloads=share.max_downloads,
             downloads_remaining=0, access_mode=access_mode,
-            requires_password=share.password_hash is not None,
+            requires_password=requires_pw,
             revoked=True, status="REVOKED",
+            wrapped_fek=share.wrapped_fek,
+            kdf_salt=share.kdf_salt,
+            kdf_iterations=share.kdf_iterations,
+            kdf_algorithm=share.kdf_algorithm,
+            wrapping_iv=share.wrapping_iv,
         )
 
     if share.expires_at and make_aware(share.expires_at) < now:
         log_event(db, share, "LINK_EXPIRED", "DENIED", request)
         db.commit()
         return RecipientCheckResponse(
-            valid=False, original_filename=filename, file_size=file_size,
+            valid=False, share_id=share.id, original_filename=filename, file_size=file_size,
             expires_at=share.expires_at, max_downloads=share.max_downloads,
             downloads_remaining=0, access_mode=access_mode,
-            requires_password=share.password_hash is not None,
+            requires_password=requires_pw,
             revoked=False, status="EXPIRED",
+            wrapped_fek=share.wrapped_fek,
+            kdf_salt=share.kdf_salt,
+            kdf_iterations=share.kdf_iterations,
+            kdf_algorithm=share.kdf_algorithm,
+            wrapping_iv=share.wrapping_iv,
         )
 
     # Download-mode only: enforce the counter limit on the info endpoint as well.
@@ -155,24 +202,49 @@ def check_recipient_access(
         log_event(db, share, "ACCESS_DENIED", "DENIED", request)
         db.commit()
         return RecipientCheckResponse(
-            valid=False, original_filename=filename, file_size=file_size,
+            valid=False, share_id=share.id, original_filename=filename, file_size=file_size,
             expires_at=share.expires_at, max_downloads=share.max_downloads,
             downloads_remaining=0, access_mode=access_mode,
-            requires_password=share.password_hash is not None,
+            requires_password=requires_pw,
             revoked=False, status="LIMIT_REACHED",
+            wrapped_fek=share.wrapped_fek,
+            kdf_salt=share.kdf_salt,
+            kdf_iterations=share.kdf_iterations,
+            kdf_algorithm=share.kdf_algorithm,
+            wrapping_iv=share.wrapping_iv,
         )
 
     log_event(db, share, "METADATA_CHECK", "SUCCESS", request)
     db.commit()
 
     return RecipientCheckResponse(
-        valid=True, original_filename=filename, file_size=file_size,
+        valid=True, share_id=share.id, original_filename=filename, file_size=file_size,
         expires_at=share.expires_at, max_downloads=share.max_downloads,
         downloads_remaining=downloads_remaining,
         access_mode=access_mode,
-        requires_password=share.password_hash is not None,
+        requires_password=requires_pw,
         revoked=False, status="OK",
+        wrapped_fek=share.wrapped_fek,
+        kdf_salt=share.kdf_salt,
+        kdf_iterations=share.kdf_iterations,
+        kdf_algorithm=share.kdf_algorithm,
+        wrapping_iv=share.wrapping_iv,
     )
+
+
+@router.get("/{token}/session-status")
+def check_recipient_session_status(
+    token: str,
+    db: Session = Depends(get_db),
+):
+    share = get_share_by_token(token, db)
+    if not share:
+        return {"valid": False, "status": "INVALID"}
+    if share.revoked:
+        return {"valid": False, "status": "REVOKED"}
+    if share.expires_at and make_aware(share.expires_at) < datetime.now(timezone.utc):
+        return {"valid": False, "status": "EXPIRED"}
+    return {"valid": True, "status": "OK"}
 
 
 @router.post("/{token}/attempt")
@@ -227,7 +299,7 @@ def authorize_password(
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Download limit reached")
 
     if share.password_hash:
-        if not payload.password or not verify_password(payload.password.strip(), share.password_hash):
+        if not _verify_share_auth(share, payload):
             log_event(db, share, "PASSWORD_FAILED", "FAILED", request)
             db.commit()
             raise HTTPException(
@@ -294,7 +366,7 @@ def download_encrypted_file(
 
     # Password check
     if share.password_hash:
-        if not payload.password or not verify_password(payload.password.strip(), share.password_hash):
+        if not _verify_share_auth(share, payload):
             log_event(db, share, "PASSWORD_FAILED", "FAILED", request)
             db.commit()
             raise HTTPException(
@@ -409,7 +481,7 @@ def view_encrypted_file(
 
     # Password check
     if share.password_hash:
-        if not payload.password or not verify_password(payload.password.strip(), share.password_hash):
+        if not _verify_share_auth(share, payload):
             log_event(db, share, "PASSWORD_FAILED", "FAILED", request)
             db.commit()
             raise HTTPException(

@@ -10,7 +10,7 @@ VaultKey implements a complete end-to-end security workflow:
 ## Key Features
 
 - **Client-Side Cryptography**: Files are encrypted in the browser using **256-bit AES-GCM** via the standard Web Crypto API before upload.
-- **Zero-Knowledge Key Delivery**: The decryption key is embedded in the URL fragment (`/share/{token}#key={key_hex}`). URL fragments are never sent to the server over HTTP.
+- **Zero-Knowledge Key Wrapping**: The File Encryption Key (FEK) is wrapped in the browser with AES-256-GCM using a Key Encryption Key (KEK) derived from a share passphrase (PBKDF2-HMAC-SHA-256, 600,000 iterations). Share URLs contain strictly a clean non-secret token (`/s/{token}`) with zero keys, IVs, or secrets in the URL.
 - **Server-Side Access Control**: FastAPI backend enforces token validation, expiration date, maximum download limits, and password verification.
 - **Atomic Download Counter**: Atomic database updates prevent race conditions and limit bypasses.
 - **Remote Revocation**: Owners can revoke share links instantly with one click, cutting off future access.
@@ -83,14 +83,18 @@ The frontend dev server will start at `http://localhost:5173`.
 2. **Upload File**: Click **+ Upload File**. Select a supported file (PDF, images, or text files).
 3. **Local Encryption**: Watch the browser perform 256-bit AES-GCM encryption before sending ciphertext to the backend.
 4. **Configure Access Controls**: Set Expiration (e.g., 24 hours), Max Downloads (e.g., 5 downloads), and optional Password (minimum 4 characters).
-5. **Save Encryption Key**: **Critical**: Copy and save the encryption key or full share URL. VaultKey never stores keys—if lost, files cannot be decrypted by anyone.
-6. **Copy Share Link**: Copy the generated link format: `http://localhost:5173/share/<token>#key=<key_hex>`.
-7. **Recipient Access**: Open the link in a private/incognito tab. The server verifies access parameters. Enter password if required.
-8. **Client-Side Decryption**: The recipient browser retrieves ciphertext and decrypts it locally using `#key` from the URL fragment, triggering file download.
+5. **Set Share Passphrase**: Generate or enter a share passphrase. The browser wraps the File Encryption Key (FEK) locally with a Key Encryption Key (KEK) derived via PBKDF2 (600,000 iterations).
+6. **Copy Clean Share Link**: Copy the generated link format: `http://localhost:5173/s/<token>` (clean URL with no secret fragments or keys).
+7. **Share Passphrase Out-of-Band**: Send the share passphrase to the recipient separately (e.g., via SMS or Signal).
+8. **Recipient Access & Decryption**: The recipient opens the clean link, enters the passphrase, and the recipient browser unwraps the FEK and decrypts the file locally.
 9. **Check Audit Log**: Return to Alice's dashboard/activity. View `ACCESS_GRANTED` and `FILE_DOWNLOADED` entries with real client IPs.
 10. **Remote Revocation**: Alice clicks **REVOKE ACCESS**. Re-opening the recipient link now immediately displays `ACCESS REVOKED`.
 
 ---
+
+## Windows Secure Viewer
+
+An optional native Windows viewer reuses the React interface and applies Windows display-capture protection to its top-level window. It fails closed if native protection cannot be enabled; this protects against supported Windows capture mechanisms, not every possible recording method. See [docs/windows-secure-viewer.md](docs/windows-secure-viewer.md) for its security boundary, setup, and manual validation checklist.
 
 ## Deployment
 

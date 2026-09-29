@@ -49,6 +49,8 @@ frontend/node_modules/
 frontend/.vite/
 frontend/node_modules/.vite/
 frontend/dist/
+/windows-secure-viewer/bin/
+/windows-secure-viewer/obj/
 *.log
 npm-debug.log*
 yarn-debug.log*

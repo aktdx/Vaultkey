@@ -3,7 +3,7 @@
 ## Security Controls Checklist
 
 - [x] **Web Crypto API**: Native browser AES-GCM 256-bit encryption.
-- [x] **Zero-Knowledge Fragment Delivery**: Decryption key passed strictly via `#key=...`.
+- [x] **Zero-Knowledge Key Wrapping**: Decryption key wrapped locally with PBKDF2 (600,000 iterations); clean URLs without secret fragments.
 - [x] **PDF Validation**: Verified both by MIME type, extension, and `%PDF-` magic header bytes.
 - [x] **Atomic Download Counter**: Race-condition-safe counter updates.
 - [x] **Strict Size Limits**: 50 MB enforced in browser and FastAPI backend.
@@ -12,7 +12,7 @@
 - [x] **View-Only Share Mode**: Server-side rejection of download API calls; browser-side deterrence layer.
 
 ## Defensive Terminology
-VaultKey uses the term **Client-side encrypted file sharing**. It does not claim "100% unhackable", "DRM screenshot proof", or "Zero-knowledge server" unless qualified by the exact URL fragment key handling model described in the architecture documentation.
+VaultKey uses the term **Client-side encrypted file sharing**. It does not claim "100% unhackable" or "DRM screenshot proof". Key security relies on authenticated client-side AES-GCM key wrapping where plaintext keys and passphrases are never transmitted to the backend.
 
 ---
 

@@ -63,6 +63,13 @@ class ShareCreateRequest(BaseModel):
     access_mode: Literal["download", "view_only"] = "download"
 
     password: Optional[str] = None
+    # Secure key wrapping fields (zero-knowledge)
+    wrapped_fek: Optional[str] = None
+    kdf_salt: Optional[str] = None
+    kdf_iterations: Optional[int] = 600000
+    kdf_algorithm: Optional[str] = "PBKDF2-HMAC-SHA-256"
+    wrapping_iv: Optional[str] = None
+    password_hash: Optional[str] = None
 
     @field_validator("password")
     @classmethod
@@ -81,6 +88,11 @@ class ShareCreateResponse(BaseModel):
     access_mode: str  # "download" | "view_only"
     has_password: bool
     created_at: datetime
+    wrapped_fek: Optional[str] = None
+    kdf_salt: Optional[str] = None
+    kdf_iterations: Optional[int] = None
+    kdf_algorithm: Optional[str] = None
+    wrapping_iv: Optional[str] = None
 
 class ShareDetailResponse(BaseModel):
     id: str
@@ -95,6 +107,11 @@ class ShareDetailResponse(BaseModel):
     revoked_at: Optional[datetime]
     created_at: datetime
     status: str # ACTIVE, EXPIRED, REVOKED, LIMIT_REACHED, VIEW_ONLY
+    wrapped_fek: Optional[str] = None
+    kdf_salt: Optional[str] = None
+    kdf_iterations: Optional[int] = None
+    kdf_algorithm: Optional[str] = None
+    wrapping_iv: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -102,6 +119,7 @@ class ShareDetailResponse(BaseModel):
 # Access / Recipient Schemas
 class RecipientCheckResponse(BaseModel):
     valid: bool
+    share_id: Optional[str] = None
     original_filename: str
     file_size: int
     expires_at: Optional[datetime]
@@ -111,9 +129,16 @@ class RecipientCheckResponse(BaseModel):
     requires_password: bool
     revoked: bool
     status: str  # OK, EXPIRED, REVOKED, LIMIT_REACHED, INVALID
+    wrapped_fek: Optional[str] = None
+    kdf_salt: Optional[str] = None
+    kdf_iterations: Optional[int] = None
+    kdf_algorithm: Optional[str] = None
+    wrapping_iv: Optional[str] = None
 
 class RecipientAuthorizeRequest(BaseModel):
     password: Optional[str] = None
+    password_hash: Optional[str] = None
+
 
 # Recipient-side audit reporting (client fires this when a restricted action is blocked).
 # The backend records the event in the shared owner's activity log so they know

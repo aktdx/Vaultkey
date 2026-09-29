@@ -7,6 +7,7 @@ import { ToastProvider } from './contexts/ToastContext'
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const SecurityPage = lazy(() => import('./pages/SecurityPage'))
 const SecureDownloadPage = lazy(() => import('./pages/SecureDownloadPage').then(m => ({ default: m.SecureDownloadPage })))
+const WindowsSecureViewerPage = lazy(() => import('./pages/WindowsSecureViewerPage').then(m => ({ default: m.WindowsSecureViewerPage })))
 const LoginPage = lazy(() => import('./pages/auth/AuthPages').then(m => ({ default: m.LoginPage })))
 const SignupPage = lazy(() => import('./pages/auth/AuthPages').then(m => ({ default: m.SignupPage })))
 const ForgotPasswordPage = lazy(() => import('./pages/auth/AuthPages').then(m => ({ default: m.ForgotPasswordPage })))
@@ -52,6 +53,7 @@ function AppRoutes() {
 
         {/* Public secure download */}
         <Route path="/s/:token" element={<SecureDownloadPage />} />
+        <Route path="/secure-viewer" element={<WindowsSecureViewerPage />} />
 
         {/* Auth */}
         <Route path="/auth/login" element={<PublicRoute><LoginPage /></PublicRoute>} />

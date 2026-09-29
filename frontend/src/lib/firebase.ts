@@ -20,14 +20,10 @@ const requiredVars = [
   'VITE_FIREBASE_APP_ID',
 ] as const
 
-for (const key of requiredVars) {
-  if (!import.meta.env[key]) {
-    throw new Error(
-      `Firebase configuration error: ${key} is not set. ` +
-      'Copy frontend/.env.example to frontend/.env and fill in your Firebase project values.'
-    )
-  }
-}
+export const isFirebaseConfigured = requiredVars.every(key => {
+  const value = import.meta.env[key]
+  return Boolean(value && !value.startsWith('your_'))
+})
 
 const firebaseConfig = {
   apiKey:            import.meta.env.VITE_FIREBASE_API_KEY as string,
@@ -39,7 +35,9 @@ const firebaseConfig = {
 }
 
 // Guard against double-init in hot-reload / test environments
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
+const app = isFirebaseConfigured
+  ? getApps()[0] ?? initializeApp(firebaseConfig)
+  : null
 
-export const auth = getAuth(app)
-export const googleProvider = new GoogleAuthProvider()
+export const auth = app ? getAuth(app) : null
+export const googleProvider = app ? new GoogleAuthProvider() : null

@@ -13,7 +13,14 @@ import {
   type ApiAccessCheck,
   type CreateSharePayload,
 } from './api'
-import { decryptFile } from './crypto'
+import {
+  decryptFile,
+  decryptFileWithKey,
+  deriveKEK,
+  unwrapFEK,
+  hexToBytes,
+  DEFAULT_KDF_ITERATIONS,
+} from './crypto'
 
 export type { ApiShareDetail as ShareRecord }
 
@@ -25,13 +32,19 @@ export interface CreateShareOptions {
   maxDownloads?: number
   accessMode?: 'download' | 'view_only'
   password?: string | null
+  passwordHash?: string | null
   label?: string | null
+  wrappedFek?: string | null
+  kdfSalt?: string | null
+  kdfIterations?: number | null
+  kdfAlgorithm?: string | null
+  wrappingIv?: string | null
 }
 
 export interface CreateShareResult {
   shareId: string
   token: string
-  shareUrl: string  // /s/{token} — caller appends #key= fragment
+  shareUrl: string  // /s/{token} — clean URL without secret fragments
 }
 
 export async function createShare(opts: CreateShareOptions): Promise<CreateShareResult> {
@@ -41,6 +54,12 @@ export async function createShare(opts: CreateShareOptions): Promise<CreateShare
     max_downloads: opts.maxDownloads ?? 5,
     access_mode: opts.accessMode ?? 'download',
     password: opts.password ?? null,
+    password_hash: opts.passwordHash ?? null,
+    wrapped_fek: opts.wrappedFek ?? null,
+    kdf_salt: opts.kdfSalt ?? null,
+    kdf_iterations: opts.kdfIterations ?? null,
+    kdf_algorithm: opts.kdfAlgorithm ?? null,
+    wrapping_iv: opts.wrappingIv ?? null,
   }
   const res = await apiCreateShare(payload)
   return {
@@ -74,29 +93,52 @@ export async function getShareByToken(token: string): Promise<ApiAccessCheck | n
 
 // ── Public: verify password ───────────────────────────────────────────────────
 
-export async function authorizePassword(token: string, password: string): Promise<void> {
-  return apiAuthorizePassword(token, password)
+export async function authorizePassword(
+  token: string,
+  password?: string,
+  passwordHash?: string
+): Promise<void> {
+  return apiAuthorizePassword(token, password, passwordHash)
+}
+
+// ── Unwrapping helper ────────────────────────────────────────────────────────
+
+/**
+ * Unwraps the FEK for a share using the recipient's passphrase and share metadata.
+ */
+export async function unwrapShareFEK(
+  access: ApiAccessCheck,
+  passphrase: string
+): Promise<CryptoKey> {
+  if (!access.wrapped_fek || !access.kdf_salt || !access.wrapping_iv) {
+    throw new Error('This share is missing key wrapping metadata.')
+  }
+  const salt = hexToBytes(access.kdf_salt)
+  const iterations = access.kdf_iterations ?? DEFAULT_KDF_ITERATIONS
+  const kek = await deriveKEK(passphrase, salt, iterations)
+  return unwrapFEK(access.wrapped_fek, kek, access.wrapping_iv)
 }
 
 // ── Public: download + decrypt ────────────────────────────────────────────────
 
 /**
  * Downloads and decrypts a DOWNLOAD-mode share, then triggers a browser save.
- * Security #2: mimeType and originalFilename are passed through to decryptFile
- * so resolveMimeType() sets the correct content-type on the saved Blob.
+ * Supports unwrapped CryptoKey directly or string key for legacy compatibility.
  */
 export async function downloadAndDecrypt(
   token: string,
-  encryptionKey: string,
-  password?: string
+  keyOrFek: CryptoKey | string,
+  password?: string,
+  passwordHash?: string
 ): Promise<void> {
-  const { blob, ivHex, originalFilename, mimeType } = await apiDownloadFile(token, password)
+  const { blob, ivHex, originalFilename, mimeType } = await apiDownloadFile(token, password, passwordHash)
 
   const arrayBuffer = await blob.arrayBuffer()
   const ivBytes = new Uint8Array(ivHex.match(/.{2}/g)!.map(b => parseInt(b, 16)))
-  // decryptFile returns a Blob with the correct MIME type resolved from
-  // serverMimeType (X-Mime-Type header) → extension fallback → octet-stream
-  const decrypted = await decryptFile(arrayBuffer, ivBytes, encryptionKey, mimeType, originalFilename)
+  
+  const decrypted = typeof keyOrFek === 'string'
+    ? await decryptFile(arrayBuffer, ivBytes, keyOrFek, mimeType, originalFilename)
+    : await decryptFileWithKey(arrayBuffer, ivBytes, keyOrFek, mimeType, originalFilename)
 
   const url = URL.createObjectURL(decrypted)
   const a = document.createElement('a')
@@ -111,20 +153,45 @@ export async function downloadAndDecrypt(
 /**
  * Fetches and decrypts a VIEW_ONLY share for in-browser rendering.
  * Returns a Blob (with correct MIME type) + metadata for ViewOnlyViewer.
- * Security #2: mimeType preservation via resolveMimeType inside decryptFile.
  */
 export async function viewAndDecrypt(
   token: string,
-  encryptionKey: string,
-  password?: string
+  keyOrFek: CryptoKey | string,
+  password?: string,
+  passwordHash?: string
 ): Promise<{ decryptedBlob: Blob; mimeType: string; fileName: string }> {
-  const { blob, ivHex, originalFilename, mimeType } = await apiViewFile(token, password)
+  const { blob, ivHex, originalFilename, mimeType } = await apiViewFile(token, password, passwordHash)
 
   const arrayBuffer = await blob.arrayBuffer()
   const ivBytes = new Uint8Array(ivHex.match(/.{2}/g)!.map(b => parseInt(b, 16)))
-  const decryptedBlob = await decryptFile(arrayBuffer, ivBytes, encryptionKey, mimeType, originalFilename)
+  const decryptedBlob = typeof keyOrFek === 'string'
+    ? await decryptFile(arrayBuffer, ivBytes, keyOrFek, mimeType, originalFilename)
+    : await decryptFileWithKey(arrayBuffer, ivBytes, keyOrFek, mimeType, originalFilename)
 
   return { decryptedBlob, mimeType: decryptedBlob.type, fileName: originalFilename }
+}
+
+export async function secureViewAndDecrypt(
+  shareId: string,
+  keyOrFek: CryptoKey | string,
+  password?: string,
+  passwordHash?: string
+): Promise<{ decryptedBlob: Blob; mimeType: string; fileName: string }> {
+  const access = await apiCheckAccess(shareId)
+  if (!access.valid) throw new Error(`Share is ${access.status.toLowerCase()}.`)
+
+  const response = access.access_mode === 'view_only'
+    ? await apiViewFile(shareId, password, passwordHash)
+    : await apiDownloadFile(shareId, password, passwordHash)
+
+  const ivBytes = new Uint8Array(response.ivHex.match(/.{2}/g)?.map(byte => parseInt(byte, 16)) ?? [])
+  if (ivBytes.length !== 12) throw new Error('Encrypted document metadata is invalid.')
+  
+  const decryptedBlob = typeof keyOrFek === 'string'
+    ? await decryptFile(await response.blob.arrayBuffer(), ivBytes, keyOrFek, response.mimeType, response.originalFilename)
+    : await decryptFileWithKey(await response.blob.arrayBuffer(), ivBytes, keyOrFek, response.mimeType, response.originalFilename)
+
+  return { decryptedBlob, mimeType: decryptedBlob.type, fileName: response.originalFilename }
 }
 
 // ── Activity log stub ─────────────────────────────────────────────────────────

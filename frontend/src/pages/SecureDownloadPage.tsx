@@ -1,22 +1,31 @@
 /**
  * SecureDownloadPage — recipient-facing share access page.
  *
- * Security #2 implementation:
- *   • Calls /view for VIEW_ONLY shares — never /download (server enforces this too).
- *   • Passes decrypted Blob to ViewOnlyViewer which has full browser-side deterrence.
- *   • Reports blocked actions (Ctrl+S, Ctrl+P, right-click) to the backend audit log.
- *   • Decryption key lives only in window.location.hash — never sent to server.
- *   • download flow: AES-256-GCM decrypt in browser → temporary anchor click → revoke URL.
+ * Implements client-side key unwrapping and decryption:
+ *   • Recipient visits clean URL: /s/<token> (no secret in URL).
+ *   • Recipient enters share passphrase out-of-band.
+ *   • Browser derives KEK from passphrase + salt (PBKDF2-HMAC-SHA-256, 600,000 rounds).
+ *   • Browser unwraps FEK locally via authenticated AES-256-GCM.
+ *   • If passphrase or tag is invalid, unwrap fails locally before any sensitive action.
+ *   • Decrypts file locally in-browser with unwrapped FEK.
+ *   • Isolated legacy support: handles legacy #key= fragment links if wrapped_fek is absent.
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import {
-  Shield, FileText, Lock, Clock, Hash,
-  Download, CheckCircle2, AlertCircle, Eye, EyeOff,
+  Shield, Lock, Clock, Hash,
+  Download, CheckCircle2, AlertCircle, Eye, EyeOff, Key,
 } from 'lucide-react'
-import { getShareByToken, authorizePassword, downloadAndDecrypt, viewAndDecrypt } from '../lib/shares'
+import {
+  getShareByToken,
+  downloadAndDecrypt,
+  viewAndDecrypt,
+  unwrapShareFEK,
+} from '../lib/shares'
 import { apiRecordAccessAttempt, apiReportBlockedAction } from '../lib/api'
-import { extractKeyFromFragment } from '../lib/utils'
+import { extractLegacyKeyFromFragment } from '../lib/utils'
+import { hashSharePassword, exportKey } from '../lib/crypto'
+import { createHandoffNonce, createSecureViewerDeepLink, transferKeyToSecureViewer } from '../lib/secureViewerHandoff'
 import { ViewOnlyViewer } from '../components/shares/ViewOnlyViewer'
 import type { ApiAccessCheck } from '../lib/api'
 
@@ -55,6 +64,8 @@ export function SecureDownloadPage() {
   const [viewerFilename, setViewerFilename] = useState('')
   const [viewerMime, setViewerMime] = useState('')
   const [showViewer, setShowViewer] = useState(false)
+  const [launchingSecureViewer, setLaunchingSecureViewer] = useState(false)
+  const [secureViewerMessage, setSecureViewerMessage] = useState('')
   const initialAccessToken = useRef<string | null>(null)
 
   // ── Fetch share metadata ────────────────────────────────────────────────────
@@ -83,35 +94,67 @@ export function SecureDownloadPage() {
   }, [token, fetchAccessState])
 
   const isViewOnly = accessData?.access_mode === 'view_only'
+  const isWrapped = Boolean(accessData?.wrapped_fek)
+  const hasLegacyKey = Boolean(extractLegacyKeyFromFragment(window.location.hash))
 
   // ── Main action handler ─────────────────────────────────────────────────────
   const handleAccess = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMsg('')
 
-    // Key lives only in the URL fragment — never sent to the server.
-    const keyBase64 = extractKeyFromFragment(window.location.hash)
-    if (!keyBase64) {
-      setErrorMsg('Missing decryption key fragment in URL. Unable to decrypt.')
-      return
-    }
+    if (!accessData) return
 
     setBusy(true)
     try {
+      let fekKey: CryptoKey | string | null = null
+      let passwordHash: string | undefined = undefined
+
+      if (isWrapped) {
+        const cleanPassphrase = password.trim()
+        if (!cleanPassphrase) {
+          setErrorMsg('Please enter the share passphrase to decrypt.')
+          setBusy(false)
+          return
+        }
+
+        try {
+          fekKey = await unwrapShareFEK(accessData, cleanPassphrase)
+        } catch {
+          throw new Error('Incorrect passphrase. Unable to unwrap encryption key.')
+        }
+
+        if (accessData.kdf_salt) {
+          passwordHash = await hashSharePassword(cleanPassphrase, accessData.kdf_salt)
+        }
+      } else {
+        // Legacy fallback for old links with #key= fragment
+        const legacyKey = extractLegacyKeyFromFragment(window.location.hash)
+        if (!legacyKey) {
+          setErrorMsg('Missing decryption key or passphrase. Unable to decrypt.')
+          setBusy(false)
+          return
+        }
+        fekKey = legacyKey
+      }
+
       if (isViewOnly) {
-        // VIEW_ONLY: use /view endpoint — logs VIEW_STARTED, never increments counter
         const { decryptedBlob, mimeType, fileName } = await viewAndDecrypt(
           token!,
-          keyBase64,
-          password || undefined,
+          fekKey,
+          password.trim() || undefined,
+          passwordHash,
         )
         setViewerBlob(decryptedBlob)
         setViewerFilename(fileName)
         setViewerMime(mimeType)
         setShowViewer(true)
       } else {
-        // DOWNLOAD: use /download endpoint, triggers browser save
-        await downloadAndDecrypt(token!, keyBase64, password || undefined)
+        await downloadAndDecrypt(
+          token!,
+          fekKey,
+          password.trim() || undefined,
+          passwordHash,
+        )
         setDownloadComplete(true)
         fetchAccessState() // refresh remaining counter
       }
@@ -122,11 +165,59 @@ export function SecureDownloadPage() {
     }
   }
 
+  const handleOpenSecureViewer = async () => {
+    if (!accessData?.share_id) {
+      setSecureViewerMessage('This share does not provide a Secure Viewer identifier.')
+      return
+    }
+
+    let keyBase64: string | null = null
+
+    if (isWrapped) {
+      const cleanPassphrase = password.trim()
+      if (!cleanPassphrase) {
+        setErrorMsg('Enter the share passphrase to launch Secure Viewer.')
+        return
+      }
+      try {
+        const fekKey = await unwrapShareFEK(accessData, cleanPassphrase)
+        keyBase64 = await exportKey(fekKey)
+      } catch {
+        setErrorMsg('Incorrect passphrase. Unable to unwrap key for Secure Viewer.')
+        return
+      }
+    } else {
+      keyBase64 = extractLegacyKeyFromFragment(window.location.hash)
+    }
+
+    if (!keyBase64) {
+      setSecureViewerMessage('The decryption key or passphrase is required.')
+      return
+    }
+
+    setLaunchingSecureViewer(true)
+    setSecureViewerMessage('Starting VaultKey Secure Viewer…')
+    try {
+      const nonce = createHandoffNonce()
+      const anchor = document.createElement('a')
+      anchor.href = createSecureViewerDeepLink(accessData.share_id, nonce)
+      anchor.rel = 'noreferrer'
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      await transferKeyToSecureViewer(accessData.share_id, nonce, keyBase64)
+      setSecureViewerMessage('The encrypted handoff completed. This browser viewer remains separate.')
+    } catch (err) {
+      setSecureViewerMessage((err as Error).message || 'Secure Viewer handoff failed.')
+    } finally {
+      setLaunchingSecureViewer(false)
+    }
+  }
+
   // ── Viewer close ──────────────────────────────────────────────────────────
   const handleViewerClose = useCallback(() => {
     setShowViewer(false)
     setViewerBlob(null)
-    // Report VIEW_COMPLETED to the backend audit log (fire-and-forget)
     if (token) apiReportBlockedAction(token, 'VIEW_COMPLETED').catch(() => {/* ignore */})
   }, [token])
 
@@ -223,11 +314,35 @@ export function SecureDownloadPage() {
               <div className="flex items-start gap-2.5 px-3 py-2.5 rounded bg-amber-500/5 border border-amber-500/15 mb-4">
                 <EyeOff size={13} className="text-amber-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-300/80">
-                  <strong>View-Only Mode</strong> — You can read this document in your browser.
-                  Downloading and printing are disabled for this share.
+                  <strong>Normal Web Viewer</strong> — browser-side restrictions are deterrence only;
+                  this browser window does not have OS-level capture protection.
                 </p>
               </div>
             )}
+
+            <div className="mb-4 rounded border border-emerald-500/20 bg-emerald-500/5 p-3">
+              <div className="flex items-start gap-2.5">
+                <Shield size={14} className="mt-0.5 shrink-0 text-emerald-400" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-emerald-200">Windows Secure Viewer</p>
+                  <p className="mt-1 text-xs text-emerald-100/60">
+                    Uses Windows display-capture protection for supported capture mechanisms.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleOpenSecureViewer}
+                    disabled={launchingSecureViewer || !accessData.share_id}
+                    className="mt-3 inline-flex items-center gap-2 rounded border border-emerald-400/30 px-3 py-2 text-xs font-medium text-emerald-100 hover:bg-emerald-400/10 disabled:cursor-wait disabled:opacity-50"
+                  >
+                    <Eye size={13} />
+                    {launchingSecureViewer ? 'Connecting…' : 'Open in Secure Viewer'}
+                  </button>
+                  {secureViewerMessage && (
+                    <p role="status" className="mt-2 text-xs text-emerald-100/70">{secureViewerMessage}</p>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Error */}
             {errorMsg && (
@@ -242,34 +357,34 @@ export function SecureDownloadPage() {
               <div className="flex items-start gap-2.5 px-3 py-2.5 rounded bg-[rgba(209,208,208,0.03)] border border-[rgba(209,208,208,0.07)]">
                 <CheckCircle2 size={13} className="text-[#6dbf8c] mt-0.5 shrink-0" />
                 <p className="text-xs text-[rgba(209,208,208,0.5)]">
-                  {isViewOnly
-                    ? 'This file will be decrypted locally. The key is never transmitted to VaultKey servers.'
+                  {isWrapped
+                    ? 'Key unwrapping and file decryption occur locally in your browser using AES-256-GCM. Plaintext keys and passphrases are never transmitted.'
                     : 'This file will be decrypted locally in your browser. The key is never transmitted to VaultKey servers.'}
                 </p>
               </div>
 
-              {/* Missing key warning */}
-              {!extractKeyFromFragment(window.location.hash) && (
+              {/* Missing legacy key warning (only if NOT using modern key wrapping) */}
+              {!isWrapped && !hasLegacyKey && (
                 <div className="flex items-start gap-2.5 px-3 py-2.5 rounded bg-[rgba(232,192,123,0.05)] border border-[rgba(232,192,123,0.15)]">
                   <AlertCircle size={13} className="text-[#e8c07b] mt-0.5 shrink-0" />
                   <p className="text-xs text-[rgba(232,192,123,0.8)]">
-                    No decryption key in URL. The link may be incomplete — ask the sender to resend the full link.
+                    This legacy link is missing a decryption key fragment in the URL. Ask the sender for the complete link.
                   </p>
                 </div>
               )}
 
-              {/* Password field */}
-              {accessData.requires_password && (
+              {/* Passphrase / Password field */}
+              {(isWrapped || accessData.requires_password) && (
                 <div>
                   <label className="block text-xs font-semibold text-[rgba(209,208,208,0.5)] mb-1.5 flex items-center gap-1.5">
-                    <Lock size={11} />
-                    <span>Password required</span>
+                    <Key size={11} className="text-[#6dbf8c]" />
+                    <span>{isWrapped ? 'Share Passphrase (Required)' : 'Password required'}</span>
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="Enter access password"
+                      placeholder={isWrapped ? 'Enter share passphrase to unwrap key…' : 'Enter access password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       className="w-full px-3.5 py-2.5 text-sm bg-[#0a0a0a] border border-[rgba(209,208,208,0.12)] rounded text-[#D1D0D0] focus:outline-none focus:border-[rgba(209,208,208,0.3)] pr-16"
@@ -282,13 +397,18 @@ export function SecureDownloadPage() {
                       {showPassword ? 'hide' : 'show'}
                     </button>
                   </div>
+                  {isWrapped && (
+                    <p className="text-[11px] text-[rgba(209,208,208,0.35)] mt-1.5">
+                      Provided out-of-band by the sender to securely unwrap the encryption key.
+                    </p>
+                  )}
                 </div>
               )}
 
               {/* Submit */}
               <button
                 type="submit"
-                disabled={busy || !extractKeyFromFragment(window.location.hash)}
+                disabled={busy || ((isWrapped || accessData.requires_password) && !password.trim()) || (!isWrapped && !hasLegacyKey)}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#D1D0D0] text-black text-sm font-medium hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 {busy ? (
@@ -311,7 +431,7 @@ export function SecureDownloadPage() {
         </div>
 
         <p className="text-[11px] text-center text-[rgba(209,208,208,0.3)] mt-6">
-          VaultKey client-side decryption occurs in your browser.
+          VaultKey zero-knowledge key unwrapping and decryption occur exclusively in your browser.
         </p>
       </Shell>
     </>

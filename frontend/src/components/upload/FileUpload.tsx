@@ -40,7 +40,7 @@ const STAGE_STEPS: UploadStage[] = ['selected', 'encrypting', 'uploading', 'comp
 
 export const FileUpload: React.FC<FileUploadProps> = ({
   onUploadComplete,
-  maxSizeBytes = 100 * 1024 * 1024, // 100 MB
+  maxSizeBytes = 50 * 1024 * 1024, // Matches the backend upload limit.
 }) => {
   const [uploads, setUploads] = useState<UploadedFile[]>([])
   const [dragging, setDragging] = useState(false)

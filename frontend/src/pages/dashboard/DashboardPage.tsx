@@ -119,7 +119,7 @@ export const DashboardPage: React.FC = () => {
   }
 
   // After upload: close the upload modal, refresh stats, open share modal
-  // with the encryption key so the full #key= URL is built automatically.
+  // with the encryption key so it can be wrapped with the share passphrase.
   const handleUploadComplete = (fileId: string, encryptionKey: string) => {
     setUploadOpen(false)
     apiListFiles().then(files => {

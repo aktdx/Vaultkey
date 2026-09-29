@@ -1,29 +1,40 @@
 /**
  * CreateShareModal — configures and creates a secure share link for a file.
  *
- * After the share is created, it shows the share URL (without the #key= fragment
- * for zero-knowledge delivery) and the full secure URL (with the fragment).
- * The user is instructed to copy the full URL and share appropriately.
+ * Implements client-side key wrapping:
+ * 1. Derives a Key Encryption Key (KEK) from a share passphrase and fresh salt
+ *    using PBKDF2-HMAC-SHA-256 (600,000 iterations).
+ * 2. Wraps the File Encryption Key (FEK) using AES-256-GCM with a fresh 12-byte nonce.
+ * 3. Uploads only the wrapped FEK, salt, iterations, algorithm, and nonces.
+ * 4. Generates a clean URL: /s/<share-id> containing NO key, IV, or secret.
+ * 5. Provides the share passphrase for out-of-band delivery to the recipient.
  */
 import React, { useState } from 'react'
 import {
   Shield, Clock, Download, Eye, Lock,
-  Copy, Check, AlertTriangle, Key
+  Copy, Check, AlertTriangle, Key, RefreshCw
 } from 'lucide-react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
-import { Toggle } from '../ui/Toggle'
 import { Badge } from '../ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
 import { createShare } from '../../lib/shares'
-import { buildShareUrl } from '../../lib/utils'
+import {
+  generateSalt,
+  generateSecurePassphrase,
+  deriveKEK,
+  wrapFEK,
+  bytesToHex,
+  hashSharePassword,
+  DEFAULT_KDF_ITERATIONS,
+  KDF_ALGORITHM,
+} from '../../lib/crypto'
 
 interface Props {
   fileId: string
   onClose: () => void
-  /** Encryption key (base64url) from the upload step. When provided the full
-   *  #key= URL is built automatically. When absent the user must paste the key. */
+  /** Encryption key (base64url) from the upload step. When absent the user must paste the key. */
   encryptionKey?: string
 }
 
@@ -31,9 +42,8 @@ type Step = 'configure' | 'created'
 
 interface ShareResult {
   token: string
-  shareUrl: string      // just the path /s/{token} — no key
-  secureUrl: string     // full URL with #key= fragment (if key is available)
-  hasKey: boolean
+  shareUrl: string      // clean URL: /s/{token} — no keys, IVs, or secrets
+  passphrase: string    // share passphrase for out-of-band delivery
 }
 
 const EXPIRY_OPTIONS = [
@@ -61,17 +71,19 @@ export const CreateShareModal: React.FC<Props> = ({ fileId, onClose, encryptionK
   const [expiryHours, setExpiryHours] = useState<number | null>(168) // 7 days default
   const [maxDownloads, setMaxDownloads] = useState(5)
   const [accessMode, setAccessMode] = useState<'download' | 'view_only'>('download')
-  const [passwordEnabled, setPasswordEnabled] = useState(false)
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  
+  // Passphrase state (for key wrapping)
+  const [passphrase, setPassphrase] = useState<string>(() => generateSecurePassphrase())
+  const [showPassphrase, setShowPassphrase] = useState(false)
 
   // Manual key input — used when re-sharing an existing file and encryptionKey
   // prop was not passed (key not available from this session's upload).
   const [manualKey, setManualKey] = useState('')
 
-  // Copy state
-  const [copiedFull, setCopiedFull] = useState(false)
-  const [copiedBase, setCopiedBase] = useState(false)
+  // Copy states
+  const [copiedLink, setCopiedLink] = useState(false)
+  const [copiedPassphrase, setCopiedPassphrase] = useState(false)
+  const [copiedAll, setCopiedAll] = useState(false)
 
   const toast = useToast()
 
@@ -79,38 +91,59 @@ export const CreateShareModal: React.FC<Props> = ({ fileId, onClose, encryptionK
   const effectiveKey = encryptionKey || manualKey.trim()
   const needsKeyInput = !encryptionKey
 
+  const handleRegeneratePassphrase = () => {
+    setPassphrase(generateSecurePassphrase())
+    toast('info', 'Passphrase refreshed', 'A new secure passphrase was generated.')
+  }
+
   const handleCreate = async () => {
-    if (passwordEnabled && password.length < 4) {
-      toast('error', 'Password too short', 'Enter at least 4 characters.')
+    const cleanPassphrase = passphrase.trim()
+    if (!cleanPassphrase || cleanPassphrase.length < 6) {
+      toast('error', 'Passphrase too short', 'Enter at least 6 characters for the share passphrase.')
       return
     }
 
-    // Validate the key is present — zero-knowledge, key is never sent to server
     if (!effectiveKey) {
-      toast('error', 'Encryption key required', 'Paste the 64-character key from your original upload.')
+      toast('error', 'Encryption key required', 'Paste the original file encryption key from your upload.')
       return
     }
 
     setLoading(true)
     try {
+      // 1. Generate fresh random salt (16 bytes)
+      const salt = generateSalt(16)
+      const saltHex = bytesToHex(salt)
+
+      // 2. Derive Key Encryption Key (KEK) using PBKDF2-HMAC-SHA-256 (600,000 iterations)
+      const kek = await deriveKEK(cleanPassphrase, salt, DEFAULT_KDF_ITERATIONS)
+
+      // 3. Authenticated AES-256-GCM key wrapping with fresh 12-byte wrapping IV
+      const { wrappedFekBase64, wrappingIvHex } = await wrapFEK(effectiveKey, kek)
+
+      // 4. Derive zero-knowledge auth hash for rate-limited backend verification
+      const passwordHash = await hashSharePassword(cleanPassphrase, saltHex)
+
+      // 5. Upload only wrapped metadata; plaintext key or passphrase is never transmitted
       const res = await createShare({
         fileId,
         expiresInHours: expiryHours,
         maxDownloads: maxDownloads,
         accessMode,
-        password: passwordEnabled ? password : null,
+        passwordHash,
+        wrappedFek: wrappedFekBase64,
+        kdfSalt: saltHex,
+        kdfIterations: DEFAULT_KDF_ITERATIONS,
+        kdfAlgorithm: KDF_ALGORITHM,
+        wrappingIv: wrappingIvHex,
       })
 
-      // Build the full zero-knowledge URL with the #key= fragment.
-      // buildShareUrl produces: {origin}/s/{token}#key={encryptionKey}
-      const shareUrl = `${window.location.origin}${res.shareUrl}`
-      const secureUrl = buildShareUrl(res.token, effectiveKey)
+      // Clean share URL: strictly /s/{token} with NO key or fragment
+      const shareUrl = `${window.location.origin}/s/${res.token}`
 
       setResult({
         token: res.token,
         shareUrl,
-        secureUrl,
-        hasKey: true,
+        passphrase: cleanPassphrase,
       })
       setStep('created')
     } catch (e) {
@@ -120,17 +153,21 @@ export const CreateShareModal: React.FC<Props> = ({ fileId, onClose, encryptionK
     }
   }
 
-  const copyToClipboard = async (text: string, type: 'full' | 'base') => {
+  const copyToClipboard = async (text: string, type: 'link' | 'passphrase' | 'all') => {
     try {
       await navigator.clipboard.writeText(text)
-      if (type === 'full') {
-        setCopiedFull(true)
-        setTimeout(() => setCopiedFull(false), 2000)
-        toast('success', 'Secure URL copied', 'Send this full link to your recipient.')
+      if (type === 'link') {
+        setCopiedLink(true)
+        setTimeout(() => setCopiedLink(false), 2000)
+        toast('success', 'Share link copied', 'The URL is clean and safe to share.')
+      } else if (type === 'passphrase') {
+        setCopiedPassphrase(true)
+        setTimeout(() => setCopiedPassphrase(false), 2000)
+        toast('success', 'Passphrase copied', 'Provide this passphrase separately to the recipient.')
       } else {
-        setCopiedBase(true)
-        setTimeout(() => setCopiedBase(false), 2000)
-        toast('success', 'Link copied', 'This link alone cannot decrypt the file.')
+        setCopiedAll(true)
+        setTimeout(() => setCopiedAll(false), 2000)
+        toast('success', 'Link & passphrase copied', 'Both details copied to clipboard.')
       }
     } catch {
       toast('error', 'Copy failed', 'Please copy the text manually.')
@@ -144,8 +181,8 @@ export const CreateShareModal: React.FC<Props> = ({ fileId, onClose, encryptionK
       title={step === 'configure' ? 'Create secure share' : 'Share link created'}
       description={
         step === 'configure'
-          ? 'Configure access controls for your secure file link.'
-          : 'Your secure link is ready. Save the encryption key — it cannot be recovered.'
+          ? 'Configure access controls and key wrapping for your secure file link.'
+          : 'Your secure link is ready. Provide the link and the passphrase separately.'
       }
       size="md"
     >
@@ -239,50 +276,53 @@ export const CreateShareModal: React.FC<Props> = ({ fileId, onClose, encryptionK
             </div>
           </div>
 
-          {/* Password protection */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-xs font-medium text-[rgba(209,208,208,0.5)] uppercase tracking-wider flex items-center gap-1.5">
-                <Lock size={11} className="opacity-60" />
-                Password protection
+          {/* Key Wrapping Passphrase */}
+          <div className="p-3.5 rounded border border-[rgba(109,191,140,0.2)] bg-[rgba(109,191,140,0.03)] space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-[rgba(109,191,140,0.9)] uppercase tracking-wider flex items-center gap-1.5">
+                <Lock size={11} className="text-[#6dbf8c]" />
+                Share Passphrase (Required)
               </label>
-              <Toggle checked={passwordEnabled} onChange={setPasswordEnabled} />
+              <button
+                type="button"
+                onClick={handleRegeneratePassphrase}
+                className="text-[11px] text-[rgba(109,191,140,0.7)] hover:text-[#6dbf8c] flex items-center gap-1 transition-colors"
+                title="Generate new passphrase"
+              >
+                <RefreshCw size={11} />
+                Regenerate
+              </button>
             </div>
-            {passwordEnabled && (
-              <div className="relative">
-                <Input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Set a share password…"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  leftIcon={<Lock size={14} />}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[rgba(209,208,208,0.4)] hover:text-[rgba(209,208,208,0.7)] transition-colors"
-                >
-                  {showPassword ? 'hide' : 'show'}
-                </button>
-              </div>
-            )}
+            <div className="relative">
+              <Input
+                type={showPassphrase ? 'text' : 'password'}
+                placeholder="Enter or generate a share passphrase…"
+                value={passphrase}
+                onChange={e => setPassphrase(e.target.value)}
+                leftIcon={<Key size={14} />}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassphrase(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[rgba(209,208,208,0.4)] hover:text-[rgba(209,208,208,0.7)] transition-colors"
+              >
+                {showPassphrase ? 'hide' : 'show'}
+              </button>
+            </div>
+            <p className="text-[11px] text-[rgba(209,208,208,0.4)] leading-relaxed">
+              The File Encryption Key is wrapped in your browser with AES-256-GCM using PBKDF2 (600,000 rounds). The server never sees the key or your passphrase.
+            </p>
           </div>
 
-          {/* Manual key input — shown when re-sharing an existing file
-               where the key was not passed from this session's upload.
-               VaultKey never stores encryption keys; if it was lost, the
-               file cannot be decrypted or shared by anyone including the owner. */}
+          {/* Manual key input — shown when re-sharing an existing file */}
           {needsKeyInput && (
             <div className="p-3.5 rounded border border-[rgba(232,192,123,0.25)] bg-[rgba(232,192,123,0.05)] space-y-2">
               <div className="flex items-start gap-2">
                 <AlertTriangle size={12} className="text-[#e8c07b] shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-[rgba(232,192,123,0.9)]">Encryption key required</p>
+                  <p className="text-xs font-medium text-[rgba(232,192,123,0.9)]">Original File Encryption Key Required</p>
                   <p className="text-[11px] text-[rgba(232,192,123,0.6)] leading-relaxed">
-                    VaultKey never stores your key. Paste the key from your original upload to build the share link.
-                  </p>
-                  <p className="text-[11px] text-[rgba(232,192,123,0.8)] font-semibold">
-                    ⚠ If the key was lost, this file cannot be decrypted or shared by anyone — including you.
+                    VaultKey never stores your keys. Paste the key from your original upload to wrap it with this new share passphrase.
                   </p>
                 </div>
               </div>
@@ -290,7 +330,7 @@ export const CreateShareModal: React.FC<Props> = ({ fileId, onClose, encryptionK
                 <Key size={12} className="text-[rgba(232,192,123,0.5)] shrink-0" />
                 <input
                   type="text"
-                  placeholder="Paste encryption key here…"
+                  placeholder="Paste original encryption key here…"
                   value={manualKey}
                   onChange={e => setManualKey(e.target.value)}
                   className="flex-1 px-3 py-1.5 text-xs font-mono bg-[#0a0a0a] border border-[rgba(232,192,123,0.2)] rounded text-[#D1D0D0] focus:outline-none focus:border-[rgba(232,192,123,0.4)] placeholder:text-[rgba(209,208,208,0.2)]"
@@ -335,57 +375,82 @@ export const CreateShareModal: React.FC<Props> = ({ fileId, onClose, encryptionK
                   {expiryHours < 24 ? `${expiryHours}h` : `${expiryHours / 24}d`}
                 </Badge>
               )}
-              {passwordEnabled && <Badge variant="info" size="sm">Password</Badge>}
               {accessMode === 'view_only' && <Badge variant="warning" size="sm">View only</Badge>}
             </div>
           </div>
 
-          {/* Secure URL with key — or key warning if somehow missing */}
+          {/* Clean Share Link */}
           <div>
             <p className="text-[11px] font-medium text-[rgba(209,208,208,0.4)] uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Key size={10} />
-              Secure link (with decryption key)
+              <Shield size={11} className="text-[#6dbf8c]" />
+              Clean Share Link (No Secret Key in URL)
             </p>
-            <div className="flex items-center gap-2 p-3 rounded border border-[rgba(109,191,140,0.15)] bg-[#0d0d0d]">
-              <span className="flex-1 font-mono text-[11px] text-[rgba(209,208,208,0.6)] truncate">
-                {result.secureUrl}
+            <div className="flex items-center gap-2 p-3 rounded border border-[rgba(209,208,208,0.12)] bg-[#0d0d0d]">
+              <span className="flex-1 font-mono text-[11px] text-[#D1D0D0] truncate select-all">
+                {result.shareUrl}
               </span>
               <button
-                onClick={() => copyToClipboard(result.secureUrl, 'full')}
-                className="shrink-0 p-1.5 rounded text-[rgba(209,208,208,0.3)] hover:text-[rgba(209,208,208,0.7)] hover:bg-[rgba(209,208,208,0.06)] transition-all"
-                title="Copy secure URL"
+                onClick={() => copyToClipboard(result.shareUrl, 'link')}
+                className="shrink-0 p-1.5 rounded text-[rgba(209,208,208,0.4)] hover:text-[#D1D0D0] hover:bg-[rgba(209,208,208,0.06)] transition-all"
+                title="Copy share link"
               >
-                {copiedFull ? <Check size={13} className="text-[#6dbf8c]" /> : <Copy size={13} />}
+                {copiedLink ? <Check size={13} className="text-[#6dbf8c]" /> : <Copy size={13} />}
               </button>
             </div>
-            <p className="text-[11px] text-[rgba(109,191,140,0.5)] mt-1.5">
-              The #key= fragment is never sent to the server — it exists only in the browser.
+            <p className="text-[11px] text-[rgba(209,208,208,0.4)] mt-1.5">
+              Contains only a random share ID. The encryption key is NOT in the URL.
             </p>
           </div>
 
-          {/* Key warning */}
-          <div className="p-4 rounded border border-[rgba(232,123,123,0.2)] bg-[rgba(232,123,123,0.05)]">
-            <div className="flex items-start gap-3">
-              <AlertTriangle size={13} className="text-[#e87b7b] shrink-0 mt-0.5" />
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-[rgba(232,123,123,0.9)]">Save this link now</p>
-                <p className="text-[11px] text-[rgba(232,123,123,0.6)] leading-relaxed">
-                  The encryption key was generated during upload and shown only once. The full secure link
-                  above embeds the key in the URL fragment — copy and send it to the recipient directly.
-                  Do not share the base URL without the #key= fragment.
-                </p>
-                <p className="text-[11px] text-[rgba(232,123,123,0.5)]">
-                  VaultKey never stores encryption keys. A lost key means permanent inaccessibility.
-                </p>
-              </div>
+          {/* Share Passphrase */}
+          <div>
+            <p className="text-[11px] font-medium text-[rgba(209,208,208,0.4)] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Lock size={11} className="text-[#e8c07b]" />
+              Share Passphrase (Provide to Recipient)
+            </p>
+            <div className="flex items-center gap-2 p-3 rounded border border-[rgba(232,192,123,0.2)] bg-[#0d0d0d]">
+              <span className="flex-1 font-mono text-xs text-[#e8c07b] truncate select-all">
+                {result.passphrase}
+              </span>
+              <button
+                onClick={() => copyToClipboard(result.passphrase, 'passphrase')}
+                className="shrink-0 p-1.5 rounded text-[rgba(209,208,208,0.4)] hover:text-[#D1D0D0] hover:bg-[rgba(209,208,208,0.06)] transition-all"
+                title="Copy passphrase"
+              >
+                {copiedPassphrase ? <Check size={13} className="text-[#6dbf8c]" /> : <Copy size={13} />}
+              </button>
             </div>
+            <p className="text-[11px] text-[rgba(232,192,123,0.7)] mt-1.5">
+              The recipient will enter this passphrase in their browser to unwrap the encryption key.
+            </p>
+          </div>
+
+          {/* Copy Both Option */}
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full text-xs"
+              leftIcon={copiedAll ? <Check size={12} className="text-[#6dbf8c]" /> : <Copy size={12} />}
+              onClick={() => copyToClipboard(`VaultKey Share:\nLink: ${result.shareUrl}\nPassphrase: ${result.passphrase}`, 'all')}
+            >
+              {copiedAll ? 'Copied Both to Clipboard' : 'Copy Link & Passphrase'}
+            </Button>
+          </div>
+
+          {/* Out-of-band Delivery Guidance */}
+          <div className="p-3.5 rounded border border-[rgba(109,191,140,0.15)] bg-[rgba(109,191,140,0.03)] space-y-1.5">
+            <p className="text-xs font-medium text-[rgba(109,191,140,0.9)]">Zero-Knowledge Out-of-Band Delivery</p>
+            <p className="text-[11px] text-[rgba(209,208,208,0.5)] leading-relaxed">
+              For maximum security, share the link and passphrase through different channels (e.g., send the link via email and the passphrase via SMS or Signal).
+            </p>
           </div>
 
           {/* Security summary */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Encryption', value: 'AES-256-GCM', good: true },
-              { label: 'Expiry', value: expiryHours ? (expiryHours < 24 ? `${expiryHours}h` : `${expiryHours / 24}d`) : 'Never', good: !!expiryHours },
+              { label: 'Key Wrapping', value: 'AES-GCM (KEK)', good: true },
+              { label: 'KDF', value: 'PBKDF2 (600k)', good: true },
               { label: 'Downloads', value: maxDownloads === 0 ? 'Unlimited' : `Max ${maxDownloads}`, good: maxDownloads > 0 },
             ].map(item => (
               <div key={item.label} className="p-3 rounded border border-[rgba(209,208,208,0.06)] bg-[#0d0d0d] text-center">

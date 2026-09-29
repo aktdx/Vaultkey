@@ -13,7 +13,7 @@ export type { ApiFile as FileRecord }
 
 export interface UploadResult {
   fileId: string
-  encryptionKey: string   // base64url — embed in share URL fragment #key=
+  encryptionKey: string   // base64url FEK — wrapped with KEK when sharing
   ivHex: string
   storagePath: string     // r2_object_key (for reference only — equals fileId)
 }

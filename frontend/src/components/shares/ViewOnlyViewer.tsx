@@ -31,7 +31,7 @@
  */
 
 import React, { useEffect, useRef, useCallback, useState } from 'react'
-import { X, EyeOff, ShieldAlert } from 'lucide-react'
+import { X, EyeOff, ShieldAlert, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react'
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist'
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.js?url'
 
@@ -117,6 +117,9 @@ interface ViewOnlyViewerProps {
   mimeType: string
   onClose: () => void
   onBlockedAction: (event: string) => void
+  secureWindows?: boolean
+  shareId?: string
+  expiresAt?: string | null
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -127,9 +130,19 @@ export function ViewOnlyViewer({
   mimeType,
   onClose,
   onBlockedAction,
+  secureWindows = false,
+  shareId,
+  expiresAt,
 }: ViewOnlyViewerProps) {
   const blobUrlRef = useRef<string | null>(null)
   const originalPrintRef = useRef<typeof window.print | null>(null)
+  const [watermarkPosition, setWatermarkPosition] = useState(0)
+
+  useEffect(() => {
+    if (!secureWindows) return
+    const timer = window.setInterval(() => setWatermarkPosition(position => (position + 1) % 4), 12_000)
+    return () => window.clearInterval(timer)
+  }, [secureWindows])
 
   // Create blob URL once
   if (!blobUrlRef.current && decryptedBlob) {
@@ -243,9 +256,14 @@ export function ViewOnlyViewer({
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-white truncate">{filename}</p>
-            <p className="text-xs text-amber-400 font-medium">
-              VIEW ONLY — Downloading and printing are disabled for this share.
+            <p className={`text-xs font-medium ${secureWindows ? 'text-emerald-300' : 'text-amber-400'}`}>
+              {secureWindows
+                ? 'WINDOWS SECURE VIEWER · CAPTURE PROTECTION ACTIVE'
+                : 'VIEW ONLY · Browser-side deterrence only'}
             </p>
+            {secureWindows && expiresAt && (
+              <p className="mt-1 text-[10px] text-white/45">Session expires {new Date(expiresAt).toLocaleString()}</p>
+            )}
           </div>
         </div>
 
@@ -253,7 +271,7 @@ export function ViewOnlyViewer({
           className="hidden sm:block text-[10px] font-mono text-gray-600 select-none mx-4 shrink-0"
           aria-hidden="true"
         >
-          VaultKey • View Only
+          {secureWindows ? 'VaultKey Secure Viewer' : 'VaultKey • View Only'}
         </span>
 
         <button
@@ -268,11 +286,15 @@ export function ViewOnlyViewer({
       {/* Content area */}
       <div className="flex-1 overflow-auto relative">
         <div
-          className="absolute inset-0 pointer-events-none z-10 flex items-end justify-end p-4"
+          className={`absolute inset-0 pointer-events-none z-10 flex p-4 ${[
+            'items-end justify-end', 'items-start justify-end', 'items-end justify-start', 'items-start justify-start',
+          ][watermarkPosition]}`}
           aria-hidden="true"
         >
-          <span className="text-[10px] font-mono text-white/5 select-none">
-            VaultKey • View Only
+          <span className={`text-[10px] font-mono select-none ${secureWindows ? 'text-white/15' : 'text-white/5'}`}>
+            {secureWindows
+              ? `VaultKey · Protected · ${shareId ?? ''} · ${new Date().toLocaleString()}`
+              : 'VaultKey • View Only'}
           </span>
         </div>
         {renderContent()}
@@ -281,9 +303,9 @@ export function ViewOnlyViewer({
       {/* Footer disclaimer */}
       <div className="shrink-0 bg-[#0D1526] border-t border-[#1E2D47] px-5 py-2 text-center">
         <p className="text-[10px] text-gray-600">
-          View-Only mode provides browser-side deterrence against casual downloading, saving, and
-          printing. Content rendered on a recipient-controlled device cannot be made completely
-          non-extractable.
+          {secureWindows
+            ? 'Windows Secure Viewer uses Windows display-capture protection for supported capture mechanisms. It cannot prevent every capture method.'
+            : 'Normal Web Viewer: browser-side deterrence only. Content in a browser cannot be made completely non-extractable.'}
         </p>
       </div>
     </div>
@@ -343,22 +365,28 @@ function PdfViewer({ decryptedBlob, filename }: { decryptedBlob: Blob; filename:
   const [pageCanvases, setPageCanvases] = useState<HTMLCanvasElement[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [pageNumber, setPageNumber] = useState(1)
+  const [zoom, setZoom] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
+  const canvasesRef = useRef<HTMLCanvasElement[]>([])
 
   useEffect(() => {
     if (!decryptedBlob) return
 
     let cancelled = false
+    let loadingTask: ReturnType<typeof getDocument> | null = null
     // ponytail: typed as any[] — PDF.js renderTask type is not exported publicly
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const activeTasks: any[] = []
 
     async function renderPdf() {
       try {
+        setLoading(true)
+        setError(null)
         const arrayBuffer = await decryptedBlob.arrayBuffer()
         if (cancelled) return
 
-        const loadingTask = getDocument({ data: arrayBuffer })
+        loadingTask = getDocument({ data: arrayBuffer })
         const pdfDoc = await loadingTask.promise
         if (cancelled) return
 
@@ -371,17 +399,17 @@ function PdfViewer({ decryptedBlob, filename }: { decryptedBlob: Blob; filename:
           if (cancelled) break
 
           const desiredWidth = containerRef.current
-            ? containerRef.current.clientWidth - 32
+            ? Math.max(320, Math.min(containerRef.current.clientWidth - 32, 960))
             : 800
           const unscaledViewport = page.getViewport({ scale: 1 })
-          const scale = desiredWidth / unscaledViewport.width
+          const scale = (desiredWidth / unscaledViewport.width) * zoom
           const viewport = page.getViewport({ scale })
 
           const canvas = document.createElement('canvas')
           canvas.width = viewport.width
           canvas.height = viewport.height
           canvas.style.display = 'block'
-          canvas.style.width = '100%'
+          canvas.style.width = `${viewport.width}px`
           canvas.setAttribute('aria-label', `Page ${pageNum} of ${numPages}`)
 
           const canvasContext = canvas.getContext('2d')!
@@ -395,6 +423,7 @@ function PdfViewer({ decryptedBlob, filename }: { decryptedBlob: Blob; filename:
         }
 
         if (!cancelled) {
+          canvasesRef.current = canvasElements
           setPageCanvases(canvasElements)
           setLoading(false)
         }
@@ -416,8 +445,14 @@ function PdfViewer({ decryptedBlob, filename }: { decryptedBlob: Blob; filename:
       for (const task of activeTasks) {
         try { task.cancel() } catch { /* ignore */ }
       }
+      for (const canvas of canvasesRef.current) {
+        canvas.width = 0
+        canvas.height = 0
+      }
+      canvasesRef.current = []
+      void loadingTask?.destroy()
     }
-  }, [decryptedBlob])
+  }, [decryptedBlob, zoom])
 
   if (loading) {
     return (
@@ -440,13 +475,47 @@ function PdfViewer({ decryptedBlob, filename }: { decryptedBlob: Blob; filename:
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full overflow-auto p-4 bg-gray-900 flex flex-col items-center gap-4"
-    >
-      {pageCanvases.map((canvas, idx) => (
-        <CanvasPage key={idx} canvas={canvas} />
-      ))}
+    <div className="flex h-full w-full flex-col bg-gray-900">
+      <div className="flex shrink-0 items-center justify-center gap-3 border-b border-white/10 bg-[#0D1526] px-3 py-2">
+        <button
+          type="button"
+          title="Previous page"
+          aria-label="Previous page"
+          disabled={pageNumber <= 1}
+          onClick={() => setPageNumber(page => Math.max(1, page - 1))}
+          className="p-2 text-gray-300 hover:bg-white/10 disabled:opacity-30"
+        ><ChevronLeft size={16} /></button>
+        <span className="min-w-24 text-center text-xs text-gray-300">Page {pageNumber} / {pageCanvases.length}</span>
+        <button
+          type="button"
+          title="Next page"
+          aria-label="Next page"
+          disabled={pageNumber >= pageCanvases.length}
+          onClick={() => setPageNumber(page => Math.min(pageCanvases.length, page + 1))}
+          className="p-2 text-gray-300 hover:bg-white/10 disabled:opacity-30"
+        ><ChevronRight size={16} /></button>
+        <span className="mx-1 h-5 w-px bg-white/10" />
+        <button
+          type="button"
+          title="Zoom out"
+          aria-label="Zoom out"
+          disabled={zoom <= 0.5}
+          onClick={() => setZoom(value => Math.max(0.5, value - 0.25))}
+          className="p-2 text-gray-300 hover:bg-white/10 disabled:opacity-30"
+        ><ZoomOut size={15} /></button>
+        <span className="min-w-12 text-center text-xs text-gray-300">{Math.round(zoom * 100)}%</span>
+        <button
+          type="button"
+          title="Zoom in"
+          aria-label="Zoom in"
+          disabled={zoom >= 2}
+          onClick={() => setZoom(value => Math.min(2, value + 0.25))}
+          className="p-2 text-gray-300 hover:bg-white/10 disabled:opacity-30"
+        ><ZoomIn size={15} /></button>
+      </div>
+      <div ref={containerRef} className="flex min-h-0 w-full flex-1 items-start justify-center overflow-auto p-4">
+        {pageCanvases[pageNumber - 1] && <CanvasPage canvas={pageCanvases[pageNumber - 1]} />}
+      </div>
     </div>
   )
 }

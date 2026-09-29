@@ -60,25 +60,32 @@ export function truncate(str: string, max: number): string {
   return str.slice(0, max - 3) + '...'
 }
 
-// ── Zero-knowledge key fragment helpers (Security #1/#2) ──────────────────────
-// The encryption key lives ONLY in the URL fragment (#key=...) and is never
-// sent to the server. These helpers construct and parse that fragment.
+// ── Share URL helpers ─────────────────────────────────────────────────────────
+// New URLs contain ONLY the random, non-secret share ID: /s/<share-id>.
+// Encryption keys, IVs, and passwords are NEVER in the URL.
 
 /**
- * Builds the full recipient share URL with the zero-knowledge key fragment.
- * Format: {origin}/s/{token}#key={encryptionKey}
+ * Builds the recipient share URL containing ONLY the random non-secret share ID.
+ * Format: {origin}/s/{shareId}
  */
-export function buildShareUrl(token: string, encryptionKey: string): string {
-  return `${window.location.origin}/s/${token}#key=${encryptionKey}`
+export function buildShareUrl(shareId: string): string {
+  const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'http://localhost:5173'
+  return `${origin}/s/${shareId}`
 }
 
 /**
- * Extracts the encryption key from a URL hash string.
+ * Isolated legacy helper: extracts an encryption key from a legacy URL hash string (#key=).
+ * @deprecated Legacy links only. New shares NEVER include keys in URL fragments.
  * @param hash - e.g. "#key=abc123..." or "key=abc123..."
  * @returns The key string, or null if absent.
  */
-export function extractKeyFromFragment(hash = window.location.hash): string | null {
-  if (!hash) return null
-  const clean = hash.startsWith('#') ? hash.slice(1) : hash
+export function extractLegacyKeyFromFragment(hash?: string): string | null {
+  const currentHash = hash ?? (typeof window !== 'undefined' && window.location ? window.location.hash : '')
+  if (!currentHash) return null
+  const clean = currentHash.startsWith('#') ? currentHash.slice(1) : currentHash
   return new URLSearchParams(clean).get('key')
 }
+
+// Kept as alias for backward compatibility with existing tests
+export const extractKeyFromFragment = extractLegacyKeyFromFragment
+

@@ -18,7 +18,7 @@ def _make_client() -> TestClient:
     return TestClient(app)
 
 def _register_and_login(client: TestClient) -> str:
-    email = "threadpool_test@vaultkey.test"
+    email = "threadpool_test@vaultkey.app"
     password = "ThreadPool999!"
     resp = client.post("/api/auth/register", json={"email": email, "password": password})
     if resp.status_code == 400:

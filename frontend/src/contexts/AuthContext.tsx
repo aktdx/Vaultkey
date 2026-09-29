@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth'
-import { auth, googleProvider } from '../lib/firebase'
+import { auth, googleProvider, isFirebaseConfigured } from '../lib/firebase'
 import {
   apiLogin,
   apiRegister,
@@ -19,6 +19,7 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<{ error: string | null }>
   signOut: () => void
   signInWithGoogle: () => Promise<{ error: string | null }>
+  googleAuthEnabled: boolean
   resetPassword: (email: string) => Promise<{ error: string | null }>
 }
 
@@ -82,10 +83,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearToken()
     setUser(null)
     // Clear Firebase client session; failure is non-fatal for VaultKey logout
-    firebaseSignOut(auth).catch(() => {/* no-op */})
+    if (auth) firebaseSignOut(auth).catch(() => {/* no-op */})
   }
 
   const signInWithGoogle = async (): Promise<{ error: string | null }> => {
+    if (!auth || !googleProvider) {
+      return { error: 'Google sign-in is not configured for this environment.' }
+    }
+
     try {
       const result = await signInWithPopup(auth, googleProvider)
       const idToken = await result.user.getIdToken(/* forceRefresh */ true)
@@ -109,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, signInWithGoogle, resetPassword }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, signInWithGoogle, googleAuthEnabled: isFirebaseConfigured, resetPassword }}>
       {children}
     </AuthContext.Provider>
   )

@@ -32,6 +32,8 @@ origins = os.environ.get(
     "ALLOWED_ORIGINS",
     "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
 ).split(",")
+if "https://vaultkey.local" not in origins:
+    origins.append("https://vaultkey.local")
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,7 +41,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["X-IV-Hex", "X-Original-Filename"],
+    expose_headers=["X-IV-Hex", "X-Original-Filename", "X-Mime-Type"],
 )
 
 # Include Routers

@@ -33,7 +33,7 @@ VaultKey implements a complete end-to-end security workflow:
 ## Security Model
 
 1. **Client-Side Encryption**: Files are encrypted in the browser before upload
-2. **Zero-Knowledge Keys**: Encryption keys are embedded in URL fragments (#key=...) which are never sent to the server
+2. **Zero-Knowledge Key Wrapping**: Encryption keys are wrapped in the browser via PBKDF2 (600,000 rounds) + AES-GCM; clean share URLs contain only random tokens with no keys
 3. **Server-Side Access Control**: Backend enforces time limits, download counters, and password protection
 4. **Audit Trail**: All access attempts are logged with IP addresses and user agents
 5. **Remote Revocation**: Owners can revoke access instantly, preventing future downloads
